@@ -288,7 +288,6 @@ class App extends Component {
       <div className="bg-dark text-white min-vh-100">
         {this.renderNavBar()}
         <div className="container py-3">
-          <h1>{currentPage}</h1>
           <hr className="border-secondary" />
           {currentPage === 'Home' ? (
             <HomeView />
