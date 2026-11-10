@@ -186,43 +186,44 @@ class App extends Component {
     });
   };
 
-  renderNavBar() {
+  renderNavigation() {
     const { currentPage, isCartOpen, cart } = this.state;
     const navItems = ['Home', 'Shop', 'Account'];
     const totalItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary position-relative">
-        <div className="container-fluid position-relative">
-          <div className="nav-brand-mark">
+      <aside className="app-sidebar">
+        <div className="nav-brand-mark">
+          <button
+            type="button"
+            className="btn p-0 border-0 bg-transparent"
+            onClick={() => {
+              this.setState({
+                currentProduct: null,
+                currentPage: 'Home',
+                isMainPage: true,
+              });
+            }}
+            aria-label="Go to home page"
+          >
+            <img src={`${import.meta.env.BASE_URL}rem-icon.png`} alt="Rem icon" className="rem-icon" />
+          </button>
+        </div>
+        <hr className="border-secondary" />
+        <nav className="navbar-nav app-navigation" aria-label="Main navigation">
+          {navItems.map((item) => (
             <button
               type="button"
-              className="btn p-0 border-0 bg-transparent"
-              onClick={() => {
-                this.setState({
-                  currentProduct: null,
-                  currentPage: 'Home',
-                  isMainPage: true,
-                });
-              }}
-              aria-label="Go to home page"
+              key={item}
+              className={currentPage === item ? 'btn btn-light btn-sm' : 'btn btn-outline-light btn-sm'}
+              onClick={() => this.changePage(item)}
             >
-              <img src={`${import.meta.env.BASE_URL}rem-icon.png`} alt="Rem icon" className="rem-icon" />
+              {item}
             </button>
-          </div>
-          <div className="navbar-nav d-flex flex-row gap-3 me-auto">
-            {navItems.map((item) => (
-              <button
-                type="button"
-                key={item}
-                className={currentPage === item ? 'btn btn-light btn-sm' : 'btn btn-outline-light btn-sm'}
-                onClick={() => this.changePage(item)}
-              >
-                {item}
-              </button>
-            ))}
-          </div>
-
+          ))}
+        </nav>
+        <hr className="border-secondary" />
+        <div className="sidebar-cart">
           <button
             type="button"
             className="btn btn-outline-light btn-sm cart-toggle"
@@ -258,7 +259,7 @@ class App extends Component {
             </div>
           )}
         </div>
-      </nav>
+      </aside>
     );
   }
 
@@ -268,51 +269,58 @@ class App extends Component {
     if (currentProduct != null) {
       return (
         <div className="bg-dark text-white min-vh-100">
-          {this.renderNavBar()}
-          <ProductDetailView
-            product={currentProduct}
-            onGoBack={() => {
-              this.setState({
-                currentProduct: null,
-                currentPage: 'Shop',
-                isMainPage: true,
-              });
-            }}
-            onAddToCart={this.addToCart}
-          />
+          <div className="app-content-layout">
+            {this.renderNavigation()}
+            <main className="app-main-content">
+              <ProductDetailView
+                product={currentProduct}
+                onGoBack={() => {
+                  this.setState({
+                    currentProduct: null,
+                    currentPage: 'Shop',
+                    isMainPage: true,
+                  });
+                }}
+                onAddToCart={this.addToCart}
+              />
+            </main>
+          </div>
         </div>
       );
     }
 
     return (
       <div className="bg-dark text-white min-vh-100">
-        {this.renderNavBar()}
-        <div className="container py-3">
-          <h1>{currentPage}</h1>
-          <hr className="border-secondary" />
-          {currentPage === 'Home' ? (
-            <HomeView />
-          ) : currentPage === 'Shop' ? (
-            <ShopView
-              products={users}
-              onSelectProduct={this.openProduct}
-              onAddToCart={this.addToCart}
-              isMainPage={isMainPage}
-            />
-          ) : currentPage === 'Account' ? (
-            <AccountView
-              onGoToCreateAccount={() => this.setState({ currentPage: 'Create Account', isMainPage: false })}
-            />
-          ) : currentPage === 'Cart' ? (
-            <CartView
-              products={cart}
-              onIncrease={(productId, variant, size) => this.changeCartItemQuantity(productId, variant, size, 1)}
-              onDecrease={(productId, variant, size) => this.changeCartItemQuantity(productId, variant, size, -1)}
-              onRemove={this.removeCartItem}
-            />
-          ) : (
-            <CreateAccountView />
-          )}
+        <div className="app-content-layout">
+          {this.renderNavigation()}
+          <main className="app-main-content">
+            <div className="container py-3">
+              <hr className="border-secondary" />
+              {currentPage === 'Home' ? (
+                <HomeView />
+              ) : currentPage === 'Shop' ? (
+                <ShopView
+                  products={users}
+                  onSelectProduct={this.openProduct}
+                  onAddToCart={this.addToCart}
+                  isMainPage={isMainPage}
+                />
+              ) : currentPage === 'Account' ? (
+                <AccountView
+                  onGoToCreateAccount={() => this.setState({ currentPage: 'Create Account', isMainPage: false })}
+                />
+              ) : currentPage === 'Cart' ? (
+                <CartView
+                  products={cart}
+                  onIncrease={(productId, variant, size) => this.changeCartItemQuantity(productId, variant, size, 1)}
+                  onDecrease={(productId, variant, size) => this.changeCartItemQuantity(productId, variant, size, -1)}
+                  onRemove={this.removeCartItem}
+                />
+              ) : (
+                <CreateAccountView />
+              )}
+            </div>
+          </main>
         </div>
       </div>
     );

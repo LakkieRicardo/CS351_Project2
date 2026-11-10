@@ -10,21 +10,14 @@ export class HomeView extends Component {
         >
           <div className="position-relative z-1 p-4 home-title-intro">
             <div className="home-hero-title-block">
-              <h2 className="display-5 fw-bold mb-0">Deadlock Item Shop</h2>
+              <img
+                src={`${import.meta.env.BASE_URL}shop-logo.png`}
+                alt="Curiosity Shop"
+                className="curiosity-shop-logo"
+              />
             </div>
             <p className="lead mb-0 mt-4">Mystic items for fighting, staying alive, and raising your spirits.</p>
           </div>
-        </div>
-        <div className="home-curiosity-callout">
-          <div className="home-rem-text">
-            <p className="home-rem-name fw-bold mb-2">Curiosity Shop</p>
-            <p className="home-rem-placeholder mb-0">Everything is on sale!</p>
-          </div>
-          <img
-            src={`${import.meta.env.BASE_URL}curiosity-shop.png`}
-            alt="Curiosity Shop"
-            className="home-curiosity-image"
-          />
         </div>
         <div className="home-rem-callout">
           <div className="home-rem-text">

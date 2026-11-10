@@ -222,7 +222,45 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+.app-content-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 160px;
+  height: 100vh;
+  padding: 1rem;
+  border-right: 1px solid #495057;
+}
+
+.app-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sidebar-cart {
+  position: relative;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.sidebar-cart .cart-toggle {
+  width: 100%;
+  justify-content: center;
+}
+
+.app-main-content {
+  flex: 1;
+  min-width: 0;
 }
 
 .rem-icon {
@@ -233,7 +271,7 @@
 }
 
 .home-title-intro {
-  max-width: 760px;
+  /* max-width: 760px; */
   width: 100%;
 }
 
@@ -295,7 +333,7 @@
   line-height: 1.6;
 }
 
-.navbar .cart-toggle {
+.cart-toggle {
   position: relative;
   z-index: 2;
   display: inline-flex;
@@ -314,11 +352,10 @@
 
 .cart-panel {
   position: absolute;
-  top: 100%;
-  right: 0;
+  bottom: 0;
+  left: calc(100% + 0.5rem);
   width: min(360px, calc(100vw - 24px));
   z-index: 20;
-  margin-top: 0.5rem;
 }
 
 .cart-panel .card {
@@ -368,6 +405,20 @@
 }
 
 @media (max-width: 600px) {
+  .app-sidebar {
+    flex-basis: 110px;
+    padding: 0.75rem 0.5rem;
+  }
+
+  .rem-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .app-navigation .btn {
+    white-space: normal;
+  }
+
   .cart-panel {
     position: fixed;
     top: 0;
@@ -410,3 +461,7 @@
     flex-shrink: 0;
   }
 }
+
+  .curiosity-shop-logo {
+    max-width : 100%;
+  }
