@@ -1,15 +1,41 @@
 import { Component } from 'react';
 
 export class AccountView extends Component {
+  state = { message: '', error: '', isSubmitting: false };
+
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    this.setState({ message: '', error: '', isSubmitting: true });
+
+    const formData = new FormData(event.currentTarget);
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: formData.get('username'),
+          password: formData.get('password'),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to log in');
+      this.setState({ message: 'Logged in successfully.', isSubmitting: false });
+    } catch (error) {
+      this.setState({ error: error.message, isSubmitting: false });
+    }
+  };
+
   render() {
     const { onGoToCreateAccount } = this.props;
+    const { message, error, isSubmitting } = this.state;
 
     return (
       <div className="container py-3">
         <h2>Log In</h2>
         <form
           className="card bg-dark text-white border-secondary p-3"
-          onSubmit={(event) => event.preventDefault()}
+          onSubmit={this.handleSubmit}
         >
           <div className="mb-3">
             <label className="form-label" htmlFor="login-username">Username</label>
@@ -35,6 +61,7 @@ export class AccountView extends Component {
           <button
             type="submit"
             className="btn btn-light"
+            disabled={isSubmitting}
           >
             Log In
           </button>
@@ -44,6 +71,8 @@ export class AccountView extends Component {
               Create Account
             </button>
           </p>
+          {message && <p className="text-success mb-0">{message}</p>}
+          {error && <p className="text-danger mb-0">{error}</p>}
         </form>
       </div>
     );

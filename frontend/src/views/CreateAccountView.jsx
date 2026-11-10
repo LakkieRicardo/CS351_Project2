@@ -1,11 +1,35 @@
 import { Component } from 'react';
 
 export class CreateAccountView extends Component {
+  state = { message: '', error: '', isSubmitting: false };
+
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    this.setState({ message: '', error: '', isSubmitting: true });
+    const formData = new FormData(event.currentTarget);
+    const formValues = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch('http://localhost:5000/api/accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formValues),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to create account');
+      event.currentTarget.reset();
+      this.setState({ message: data.message, isSubmitting: false });
+    } catch (error) {
+      this.setState({ error: error.message, isSubmitting: false });
+    }
+  };
+
   render() {
+    const { message, error, isSubmitting } = this.state;
     return (
       <div className="container py-3">
         <h2>Create Account</h2>
-        <form className="card bg-dark text-white border-secondary p-3">
+        <form className="card bg-dark text-white border-secondary p-3" onSubmit={this.handleSubmit}>
           <div className="row g-3">
           <div className="col-12">
             <label className="form-label" htmlFor="create-username">Username</label>
@@ -103,7 +127,9 @@ export class CreateAccountView extends Component {
             />
           </div>
           <div className="col-12">
-            <button type="submit" className="btn btn-light">Create Account</button>
+            <button type="submit" className="btn btn-light" disabled={isSubmitting}>Create Account</button>
+            {message && <p className="text-success mb-0">{message}</p>}
+            {error && <p className="text-danger mb-0">{error}</p>}
           </div>
           </div>
         </form>
