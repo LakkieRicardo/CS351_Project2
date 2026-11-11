@@ -5,6 +5,7 @@ const usernamePattern = /^[A-Za-z0-9_]{3,20}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function publicUser(user) {
+  // Security requirement: never send passwordHash back to the React client.
   return {
     id: user._id,
     username: user.username,
@@ -15,6 +16,7 @@ function publicUser(user) {
 }
 
 function validateAccountInput(body, { requirePassword = true } = {}) {
+  // validate account data on the server.
   const { username, email, password } = body;
 
   if (!username || !usernamePattern.test(username)) {
@@ -41,6 +43,7 @@ export function createAccountController(usersCollection) {
       }
 
       const { username, email, password, phone, street, city, state, zip } = request.body;
+      // username and email must be unique in users.
       const existingUser = await usersCollection.findOne({
         $or: [{ username }, { email: email.toLowerCase() }],
       });
@@ -49,6 +52,7 @@ export function createAccountController(usersCollection) {
         return response.status(409).json({ error: 'Username or email already exists' });
       }
 
+      // hash passwords before storing them in MongoDB.
       const passwordHash = await bcrypt.hash(password, 12);
       await usersCollection.insertOne({
         username,
@@ -76,12 +80,14 @@ export function createAccountController(usersCollection) {
       const user = await usersCollection.findOne({
         $or: [{ username }, { email: username.toLowerCase() }],
       });
+      // compare against the stored password hash.
       const passwordMatches = user && await bcrypt.compare(password, user.passwordHash);
 
       if (!passwordMatches) {
         return response.status(401).json({ error: 'Invalid username or password' });
       }
 
+      // store the user's MongoDB _id in the session.
       request.session.userId = user._id.toString();
       response.json({ user: publicUser(user) });
     } catch (error) {
@@ -91,6 +97,7 @@ export function createAccountController(usersCollection) {
   }
 
   function logout(request, response) {
+    // destroy the Express session on logout.
     request.session.destroy((error) => {
       if (error) {
         console.error('Failed to log out:', error);
@@ -101,6 +108,7 @@ export function createAccountController(usersCollection) {
   }
 
   async function getAccount(request, response) {
+    // return data for the currently logged-in user.
     if (!request.session.userId) {
       return response.status(401).json({ error: 'You must be logged in' });
     }
@@ -114,6 +122,7 @@ export function createAccountController(usersCollection) {
   }
 
   async function updateAccount(request, response) {
+    // update account fields without changing MongoDB _id.
     if (!request.session.userId) {
       return response.status(401).json({ error: 'You must be logged in' });
     }

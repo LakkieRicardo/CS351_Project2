@@ -10,6 +10,7 @@ export class CreateAccountView extends Component {
     const formValues = Object.fromEntries(formData.entries());
 
     try {
+      // send account data to Express for server validation.
       const response = await fetch('http://localhost:5000/api/accounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

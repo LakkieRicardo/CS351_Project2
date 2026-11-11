@@ -22,6 +22,7 @@ class App extends Component {
   }
 
   componentDidMount() {
+    // Project 2 requirement: load products through Express from MongoDB.
     fetch('http://localhost:5000/api/products')
       .then((response) => response.json())
       .then((data) => {

@@ -9,6 +9,7 @@ export class AccountView extends Component {
 
     const formData = new FormData(event.currentTarget);
     try {
+      //login uses the Express API and session cookie.
       const response = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

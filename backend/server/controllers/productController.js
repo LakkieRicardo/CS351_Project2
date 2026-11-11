@@ -1,4 +1,5 @@
 export function createProductController(productsCollection) {
+  // return the complete products collection as JSON.
   async function getProducts(request, response) {
     try {
       const products = await productsCollection.find({}).toArray();
@@ -9,9 +10,11 @@ export function createProductController(productsCollection) {
     }
   }
 
+  // return one product for the Product Detail view.
   async function getProductById(request, response) {
     try {
       const productId = Number(request.params.id);
+      // Server-side validation rejects invalid IDs before querying MongoDB.
       if (!Number.isInteger(productId)) {
         return response.status(400).json({ error: 'Product ID must be a number' });
       }
