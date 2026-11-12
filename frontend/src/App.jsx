@@ -12,7 +12,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      users: [],
+      products: [],
       currentProduct: null,
       currentPage: 'Home',
       isMainPage: true,
@@ -22,10 +22,11 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch(`${import.meta.env.BASE_URL}products.json`)
+    // Project 2 requirement: load products through Express from MongoDB.
+    fetch('http://localhost:5000/api/products')
       .then((response) => response.json())
       .then((data) => {
-        this.setState({ users: data });
+        this.setState({ products: data });
       })
       .catch((error) => {
         console.error('Failed to load products:', error);
@@ -264,7 +265,7 @@ class App extends Component {
   }
 
   render() {
-    const { users, currentProduct, currentPage, isMainPage, cart } = this.state;
+    const { products, currentProduct, currentPage, isMainPage, cart } = this.state;
 
     if (currentProduct != null) {
       return (
@@ -300,7 +301,7 @@ class App extends Component {
                 <HomeView />
               ) : currentPage === 'Shop' ? (
                 <ShopView
-                  products={users}
+                  products={products}
                   onSelectProduct={this.openProduct}
                   onAddToCart={this.addToCart}
                   isMainPage={isMainPage}
