@@ -5,14 +5,23 @@ service on Google Cloud Run. The root `Dockerfile` builds the frontend and
 packages it with the backend; Express serves the static site and `/api`
 endpoints from the same origin.
 
-## Deploy from a connected repository
+## Google Cloud Run
+
+### 1. Update an existing deployment
+
+After GitHub CI/CD is connected to the Cloud Run service, push changes to the
+configured deployment branch. The connected build pipeline builds the root
+`Dockerfile` and deploys a new Cloud Run revision. Check the build run and
+Cloud Run revision status if an update does not complete.
+
+### 2. Initially deploy with GitHub CI/CD
 
 1. Push this repository to GitHub.
-2. In Google Cloud Console, open **Cloud Run** and create a service using the
-   continuous deployment/source repository option. Connect the GitHub
-   repository (through Cloud Build or the repository connection flow), then
-   select the branch to deploy.
-3. Configure the build to use the repository's root `Dockerfile`.
+2. In Google Cloud Console, open **Cloud Run** and create a service with
+   continuous deployment from a source repository. Connect the GitHub
+   repository through the Cloud Build/repository connection flow and select
+   the branch to deploy.
+3. Configure the build to use the root `Dockerfile`.
 4. Configure the service runtime environment:
    - Set `MONGODB_URI` to the database connection string.
    - Set `SESSION_SECRET` to a secure random value.
