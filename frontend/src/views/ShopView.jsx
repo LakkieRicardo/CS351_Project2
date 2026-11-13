@@ -19,12 +19,20 @@ export class ShopView extends Component {
       .map(({ product }) => product);
 
     return (
-      <ProductList
-        products={prioritizedProducts}
-        onSelectProduct={onSelectProduct}
-        onAddToCart={onAddToCart}
-        isMainPage={isMainPage}
-      />
+      <div className="shop-view-content">
+        <img
+          src={`${import.meta.env.BASE_URL}shop-header.png`}
+          alt="Hot fresh items"
+          className="shop-header"
+        />
+        <hr className="border-secondary" />
+        <ProductList
+          products={prioritizedProducts}
+          onSelectProduct={onSelectProduct}
+          onAddToCart={onAddToCart}
+          isMainPage={isMainPage}
+        />
+      </div>
     );
   }
 }
