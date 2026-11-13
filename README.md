@@ -24,11 +24,9 @@ Cloud Run revision status if an update does not complete.
 3. Configure the build to use the root `Dockerfile`.
 4. Configure the service runtime environment:
    - Set `MONGODB_URI` to the database connection string.
-   - Set `MONGODB_PORT` if that single-host `mongodb://` URI omits its port.
    - Set `SESSION_SECRET` to a secure random value.
    - Store `MONGODB_URI` and `SESSION_SECRET` in Secret Manager and expose
      them as service secrets; do not commit credentials to the repository.
-     `MONGODB_PORT` is a regular environment variable, not a secret.
    - Cloud Run provides `PORT`; the container listens on port `8080`.
 5. If the storefront should be publicly available, allow unauthenticated
    requests, then create the service.
@@ -52,14 +50,11 @@ with the required settings:
 
 ```env
 MONGODB_URI=<MongoDB connection URL>
-MONGODB_PORT=27017
 PORT=5000
 SESSION_SECRET=<secure local session secret>
 ```
 
-`PORT` is the Express HTTP listener port. `MONGODB_PORT` is an optional MongoDB
-connection port for a single-host `mongodb://` URI that does not already
-specify a port; it defaults to MongoDB's standard port when omitted.
+`PORT` is the Express HTTP listener port.
 
 Then start Express:
 
