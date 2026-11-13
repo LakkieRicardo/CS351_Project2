@@ -4,16 +4,25 @@
 }
 
 .product-listing-item {
+  --app-text-color: #222021;
   display: flex;
   flex-direction: column;
   margin: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
   border-radius: 8px;
   padding: 12px;
-  background: #111;
+  background: #A67A49;
   box-sizing: border-box;
   color: white;
   max-width: 256px;
+}
+
+.product-listing-item .product-size-box,
+.product-listing-item .product-variant-box,
+.product-listing-item .popular-ribbon,
+.product-listing-item .sale-ribbon,
+.product-listing-item .stock-ribbon {
+  --app-text-color: #EFDEBF;
 }
 
 .product-card-clickable {
@@ -235,16 +244,94 @@
   top: 0;
   display: flex;
   flex-direction: column;
-  flex: 0 0 160px;
+  flex: 0 0 210px;
   height: 100vh;
-  padding: 1rem;
-  border-right: 1px solid #495057;
+  padding: 1rem 0 1rem 1rem;
+  background: #0C0702;
+  border-right: 50px solid #B08946;
+}
+
+.app-sidebar.home-page {
+  border-right-color: #B867DE;
+}
+
+.app-sidebar.shop-page {
+  border-right-color: #E1B10C;
+}
+
+.app-sidebar.account-page {
+  border-right-color: #57A6B6;
+}
+
+.app-sidebar.cart-page {
+  border-right-color: #A2CA3C;
 }
 
 .app-navigation {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.app-navigation-button {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 0.5rem;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-navigation-button,
+.app-navigation-button:hover,
+.app-navigation-button:focus,
+.app-navigation-button:active,
+.app-navigation-button.btn-light {
+  background-color: #B08946;
+  border-color: #B08946;
+}
+
+.app-navigation-button.home-page-highlight,
+.app-navigation-button.home-page-highlight:hover,
+.app-navigation-button.home-page-highlight:focus,
+.app-navigation-button.home-page-highlight:active {
+  background-color: #B867DE;
+  border-color: #B867DE;
+}
+
+.app-navigation-button.shop-page-highlight,
+.app-navigation-button.shop-page-highlight:hover,
+.app-navigation-button.shop-page-highlight:focus,
+.app-navigation-button.shop-page-highlight:active {
+  background-color: #E1B10C;
+  border-color: #E1B10C;
+}
+
+.app-navigation-button.account-page-highlight,
+.app-navigation-button.account-page-highlight:hover,
+.app-navigation-button.account-page-highlight:focus,
+.app-navigation-button.account-page-highlight:active {
+  background-color: #57A6B6;
+  border-color: #57A6B6;
+}
+
+.app-navigation-button.cart-page-highlight,
+.app-navigation-button.cart-page-highlight:hover,
+.app-navigation-button.cart-page-highlight:focus,
+.app-navigation-button.cart-page-highlight:active {
+  background-color: #A2CA3C;
+  border-color: #A2CA3C;
+}
+
+.app-navigation-icon {
+  display: block;
+  width: 75%;
+  height: 75%;
+  object-fit: contain;
 }
 
 .sidebar-cart {
@@ -263,7 +350,12 @@
   min-width: 0;
 }
 
-.rem-icon {
+.shop-view-background {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #A29175 0%, #574B3D 100%);
+}
+
+.nav-icon {
   width: 64px;
   height: 64px;
   object-fit: contain;
@@ -342,6 +434,9 @@
 }
 
 .cart-count-badge {
+  position: absolute;
+  right: 0.2rem;
+  bottom: 0.1rem;
   display: inline-block;
   min-width: 1.25rem;
   color: #f8f9fa;
@@ -406,11 +501,11 @@
 
 @media (max-width: 600px) {
   .app-sidebar {
-    flex-basis: 110px;
-    padding: 0.75rem 0.5rem;
+    flex-basis: 160px;
+    padding: 0.75rem 0 0.75rem 0.5rem;
   }
 
-  .rem-icon {
+  .nav-icon {
     width: 48px;
     height: 48px;
   }
