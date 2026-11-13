@@ -4,13 +4,13 @@ import dotenv from 'dotenv';
 import session from 'express-session';
 import { MongoClient } from 'mongodb';
 import { createAccountController } from './controllers/accountController.js';
+import { createOrderController } from './controllers/orderController.js';
 import { createProductController } from './controllers/productController.js';
 import { createAccountRoutes } from './routes/accountRoutes.js';
+import { createOrderRoutes } from './routes/orderRoutes.js';
 import { createProductRoutes } from './routes/productRoutes.js';
 import { createCartController } from './controllers/cartController.js';
-import { createOrderController } from './controllers/orderController.js';
 import { createCartRoutes } from './routes/cartRoutes.js';
-import { createOrderRoutes } from './routes/orderRoutes.js';
 
 dotenv.config();
 
@@ -51,8 +51,8 @@ async function startServer() {
     );
 
     app.use('/api', createAccountRoutes(accountController));
-    app.use('/api/cart', createCartRoutes(cartController));
     app.use('/api/orders', createOrderRoutes(orderController));
+    app.use('/api/cart', createCartRoutes(cartController));
     // Product data is served from MongoDB through Express, not products.json.
     app.use('/api/products', createProductRoutes(productController));
 

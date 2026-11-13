@@ -63,8 +63,9 @@ export class CartView extends Component {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     this.props.onPlaceOrder({
-      firstName: formData.get('firstName'),
-      lastName: formData.get('lastName'),
+      cardType: formData.get('cardType'),
+      cardNumber: formData.get('cardNumber'),
+      cvv: formData.get('cvv'),
     });
   };
 
@@ -156,24 +157,39 @@ export class CartView extends Component {
                 <form className="mt-3" onSubmit={this.handlePlaceOrder}>
                   <div className="row g-2 mb-3">
                     <div className="col-sm-6">
-                      <label className="form-label" htmlFor="checkout-first-name">First name</label>
+                      <label className="form-label" htmlFor="checkout-card-type">Card type</label>
                       <input
-                        id="checkout-first-name"
-                        className="form-control checkout-name-input"
-                        name="firstName"
-                        autoComplete="given-name"
-                        maxLength={50}
+                        id="checkout-card-type"
+                        className="form-control"
+                        name="cardType"
+                        placeholder="Visa, Mastercard, etc."
                         required
                       />
                     </div>
                     <div className="col-sm-6">
-                      <label className="form-label" htmlFor="checkout-last-name">Last name</label>
+                      <label className="form-label" htmlFor="checkout-card-number">Card number</label>
                       <input
-                        id="checkout-last-name"
-                        className="form-control checkout-name-input"
-                        name="lastName"
-                        autoComplete="family-name"
-                        maxLength={50}
+                        id="checkout-card-number"
+                        className="form-control"
+                        name="cardNumber"
+                        inputMode="numeric"
+                        autoComplete="cc-number"
+                        pattern="[0-9 ]{12,23}"
+                        maxLength={23}
+                        required
+                      />
+                    </div>
+                    <div className="col-sm-6">
+                      <label className="form-label" htmlFor="checkout-cvv">CVV</label>
+                      <input
+                        id="checkout-cvv"
+                        className="form-control"
+                        name="cvv"
+                        type="password"
+                        inputMode="numeric"
+                        autoComplete="cc-csc"
+                        pattern="[0-9]{3,4}"
+                        maxLength={4}
                         required
                       />
                     </div>

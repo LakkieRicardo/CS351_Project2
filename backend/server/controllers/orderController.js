@@ -9,16 +9,16 @@ function getUnitPrice(product, size, variant) {
   return roundCurrency(Number(product.salePrice) * sizeMultiplier * variantMultiplier);
 }
 
+function getLastFour(cardNumber) {
+  return cardNumber.replace(/\D/g, '').slice(-4);
+}
+
 function hasCompleteCheckoutProfile(user) {
   const address = user.shippingAddress || {};
   const phoneDigits = String(user.phone || '').replace(/\D/g, '');
   return Boolean(
-    user.email
-    && phoneDigits.length >= 10
-    && address.street?.trim()
-    && address.city?.trim()
-    && /^[A-Za-z]{2}$/.test(address.state || '')
-    && /^\d{5}(?:-\d{4})?$/.test(address.zip || ''),
+    user.email && phoneDigits.length >= 10 && address.street?.trim() && address.city?.trim()
+      && /^[A-Za-z]{2}$/.test(address.state || '') && /^\d{5}(?:-\d{4})?$/.test(address.zip || ''),
   );
 }
 
@@ -28,10 +28,20 @@ export function createOrderController(usersCollection, ordersCollection, product
       if (!request.session.userId || !ObjectId.isValid(request.session.userId)) {
         return response.status(401).json({ error: 'You must be logged in to place an order' });
       }
+
       const firstName = typeof request.body.firstName === 'string' ? request.body.firstName.trim() : '';
       const lastName = typeof request.body.lastName === 'string' ? request.body.lastName.trim() : '';
       if (!firstName || firstName.length > 50 || !lastName || lastName.length > 50) {
         return response.status(400).json({ error: 'First and last name are required and must be 50 characters or fewer' });
+      }
+
+      // accept payment details for the simulated checkout,
+      // but store only card type and the last four digits.
+      const { cardType, cardNumber, cvv } = request.body;
+      const cardDigits = typeof cardNumber === 'string' ? cardNumber.replace(/\D/g, '') : '';
+      const cvvDigits = typeof cvv === 'string' ? cvv.replace(/\D/g, '') : '';
+      if (!cardType || cardDigits.length < 12 || cardDigits.length > 19 || !/^\d{3,4}$/.test(cvvDigits)) {
+        return response.status(400).json({ error: 'Valid card type, card number, and CVV are required' });
       }
 
       const cart = request.session.cart || [];
@@ -44,9 +54,7 @@ export function createOrderController(usersCollection, ordersCollection, product
         return response.status(404).json({ error: 'Account not found' });
       }
       if (!hasCompleteCheckoutProfile(user)) {
-        return response.status(400).json({
-          error: 'Complete your profile with a valid phone number and shipping address before checkout',
-        });
+        return response.status(400).json({ error: 'Complete your profile with a valid phone number and shipping address before checkout' });
       }
 
       const quantitiesByProduct = new Map();
@@ -61,11 +69,13 @@ export function createOrderController(usersCollection, ordersCollection, product
         [...quantitiesByProduct.keys()].map((productId) => productsCollection.findOne({ id: productId })),
       );
       const productById = new Map(products.filter(Boolean).map((product) => [product.id, product]));
+
       for (const [productId, quantity] of quantitiesByProduct) {
         const product = productById.get(productId);
         if (!product) {
           return response.status(409).json({ error: `Product ${productId} is no longer available` });
         }
+
         if (!Number.isFinite(Number(product.quantityInStock)) || quantity > Number(product.quantityInStock)) {
           return response.status(409).json({ error: `${product.name} does not have enough stock` });
         }
@@ -76,10 +86,12 @@ export function createOrderController(usersCollection, ordersCollection, product
         if (!product.variants?.includes(item.variant) || !availableSizes(product).includes(item.size)) {
           return null;
         }
+
         const unitPrice = getUnitPrice(product, item.size, item.variant);
         if (!Number.isFinite(unitPrice) || unitPrice < 0) {
           return null;
         }
+
         return {
           productId: product.id,
           name: product.name,
@@ -96,23 +108,24 @@ export function createOrderController(usersCollection, ordersCollection, product
       }
 
       const itemCount = orderItems.reduce((sum, item) => sum + item.quantity, 0);
-      const subtotal = roundCurrency(
-        orderItems.reduce((sum, item) => sum + item.lineTotal, 0),
-      );
+      const subtotal = roundCurrency(orderItems.reduce((sum, item) => sum + item.lineTotal, 0));
       const shipping = roundCurrency(itemCount * 10);
       const taxes = roundCurrency(subtotal * 0.08);
       const total = roundCurrency(subtotal + shipping + taxes);
+
       await countersCollection.updateOne(
         { _id: 'order-counter' },
         { $setOnInsert: { sequence: 1000 } },
         { upsert: true },
       );
+
       const counterResult = await countersCollection.findOneAndUpdate(
         { _id: 'order-counter' },
         { $inc: { sequence: 1 } },
         { returnDocument: 'after' },
       );
       const counter = counterResult.value || counterResult;
+
       const order = {
         _id: `ORD-${counter.sequence}`,
         userId: user._id.toString(),
@@ -124,16 +137,15 @@ export function createOrderController(usersCollection, ordersCollection, product
           phone: user.phone,
         },
         shippingAddress: { ...user.shippingAddress },
+        payment: { cardType, last4: getLastFour(cardDigits) },
         items: orderItems,
         totals: { subtotal, shipping, taxes, total, itemCount },
+        status: 'Submitted',
       };
 
       await ordersCollection.insertOne(order);
       request.session.cart = [];
-      response.status(201).json({
-        message: 'Order created successfully',
-        order,
-      });
+      response.status(201).json({ message: 'Order created successfully', order });
     } catch (error) {
       console.error('Failed to create order:', error);
       response.status(500).json({ error: 'Failed to create order' });
@@ -145,10 +157,7 @@ export function createOrderController(usersCollection, ordersCollection, product
       if (!request.session.userId || !ObjectId.isValid(request.session.userId)) {
         return response.status(401).json({ error: 'You must be logged in to view orders' });
       }
-      const orders = await ordersCollection
-        .find({ userId: request.session.userId })
-        .sort({ orderDate: -1 })
-        .toArray();
+      const orders = await ordersCollection.find({ userId: request.session.userId }).sort({ orderDate: -1 }).toArray();
       response.json({ orders });
     } catch (error) {
       console.error('Failed to retrieve orders:', error);
@@ -161,13 +170,12 @@ export function createOrderController(usersCollection, ordersCollection, product
       if (!request.session.userId || !ObjectId.isValid(request.session.userId)) {
         return response.status(401).json({ error: 'You must be logged in to view orders' });
       }
+
       if (!/^ORD-\d+$/.test(request.params.id)) {
         return response.status(400).json({ error: 'Invalid order ID' });
       }
-      const order = await ordersCollection.findOne({
-        _id: request.params.id,
-        userId: request.session.userId,
-      });
+
+      const order = await ordersCollection.findOne({ _id: request.params.id, userId: request.session.userId });
       if (!order) {
         return response.status(404).json({ error: 'Order not found' });
       }
