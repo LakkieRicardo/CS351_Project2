@@ -31,7 +31,7 @@ VITE_API_BASE_URL=http://localhost:5000
 3. Set `base` in `vite.config.js` to the URL path where the static site will be
    hosted. Use `/` when hosted at the domain root. For a subdirectory, use that
    path with leading and trailing slashes, such as `/shop/`. The current value
-   is `/cs351.lakkie.net/project1/`; change it if your Google Cloud hosting
+   is `/cs351.lakkie.net/project2/`; change it if your Google Cloud hosting
    path differs.
 4. Configure the backend to allow requests from the exact frontend origin.
    The current CORS configuration only allows `http://localhost:5173`, so
