@@ -1,44 +1,73 @@
 # CS-351 Project 2
 
-This repository our group repository for Project 2 of CS-351. Each group member is added as a collaborator to this repository.
+A React/Vite storefront served by an Express API, designed to deploy as one
+service on Google Cloud Run. The root `Dockerfile` builds the frontend and
+packages it with the backend; Express serves the static site and `/api`
+endpoints from the same origin.
 
-## Group Members
+## Deploy from a connected repository
 
-Nathan Panopio, Joanna van Schie, Lauren Sediles
+1. Push this repository to GitHub.
+2. In Google Cloud Console, open **Cloud Run** and create a service using the
+   continuous deployment/source repository option. Connect the GitHub
+   repository (through Cloud Build or the repository connection flow), then
+   select the branch to deploy.
+3. Configure the build to use the repository's root `Dockerfile`.
+4. Configure the service runtime environment:
+   - Set `MONGODB_URI` to the database connection string.
+   - Set `SESSION_SECRET` to a secure random value.
+   - Store both values in Secret Manager and expose them as service secrets;
+     do not commit credentials to the repository.
+   - Cloud Run provides `PORT`; the container listens on port `8080`.
+5. If the storefront should be publicly available, allow unauthenticated
+   requests, then create the service.
 
-## Project Overview
+Each deployment builds the Vite frontend and installs only the backend's
+production dependencies in the container. The frontend calls `/api` on the
+same origin, so no production API URL configuration is needed. You can
+override the API URL for local development in
+`frontend/client/.env.local`.
 
-* **frontend**: This is a React/Vite frontend application that communicates with the Express API. It builds to static files in `frontend/dist/`, which can be deployed to Google Cloud static hosting independently of the backend. See [frontend/README.md](frontend/README.md) for deployment steps.
-* **backend**: This is an Express API that manages user accounts and connects to the MongoDB database. The controllers folder contains a set of controllers for managing each collection of the database and validating, storing, updating, and queryig data.
+The backend connects to the `CS351Project2` MongoDB database. Make sure the
+Cloud Run service can reach your MongoDB deployment and that its network access
+rules permit the connection.
 
-## Build Instructions
+## Local development
 
-First, build the backend by setting up the .env file. You will need database connections specified with the following fields:
+### Backend
+
+From `backend/server`, install dependencies and provide a local `.env` file
+with the required settings:
 
 ```env
 MONGODB_URI=<MongoDB connection URL>
 PORT=5000
+SESSION_SECRET=<secure local session secret>
 ```
 
-Then, install the dependencies by running:
+Then start Express:
 
-```bash
-npm install
-npm run start
+```powershell
+npm ci
+npm start
 ```
 
-The backend server should now be running. Next, start the frontend server by navigating to the frontend directory and setting up the .env file:
+### Frontend
+
+From `frontend/client`, install dependencies and create `.env.local` to point
+the Vite development server at the local backend:
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000
 ```
 
-Save that file, and run the following commands to start the frontend server:
-```bash
-npm install
+Then start Vite:
+
+```powershell
+npm ci
 npm run dev
 ```
 
-## Deployment Instructions
-
-TBD
+The root `deploy.ps1` script is available for local packaging and starts the
+packaged server. Cloud Run builds directly from the connected repository using
+the root `Dockerfile`.

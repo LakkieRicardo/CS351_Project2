@@ -5,7 +5,7 @@
   "type": "module",
   "homepage": "/cs351.lakkie.net/lab-5.1-2/",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview"

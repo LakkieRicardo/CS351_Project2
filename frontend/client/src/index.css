@@ -6,14 +6,14 @@
 
 @font-face {
   font-family: 'Noto Sans JP';
-  src: url('/cs351.lakkie.net/project1/notosansjp-regular.ttf') format('truetype');
+  src: url('/notosansjp-regular.ttf') format('truetype');
   font-style: normal;
   font-weight: 400;
 }
 
 @font-face {
   font-family: 'ValveOracle';
-  src: url('/cs351.lakkie.net/project1/valveoracle-medium.ttf') format('truetype');
+  src: url('/valveoracle-medium.ttf') format('truetype');
   font-style: normal;
   font-weight: 500;
 }
