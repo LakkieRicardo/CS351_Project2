@@ -6,7 +6,8 @@ export class CreateAccountView extends Component {
   handleSubmit = async (event) => {
     event.preventDefault();
     this.setState({ message: '', error: '', isSubmitting: true });
-    const formData = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
     const formValues = Object.fromEntries(formData.entries());
 
     try {
@@ -18,7 +19,7 @@ export class CreateAccountView extends Component {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Unable to create account');
-      event.currentTarget.reset();
+      form.reset();
       this.setState({ message: data.message, isSubmitting: false });
     } catch (error) {
       this.setState({ error: error.message, isSubmitting: false });
@@ -32,6 +33,14 @@ export class CreateAccountView extends Component {
         <h2>Create Account</h2>
         <form className="card bg-dark text-white border-secondary p-3" onSubmit={this.handleSubmit}>
           <div className="row g-3">
+          <div className="col-12 col-md-6">
+            <label className="form-label" htmlFor="create-first-name">First Name</label>
+            <input id="create-first-name" className="form-control" name="firstName" autoComplete="given-name" pattern="[A-Za-z .'-]{2,50}" required />
+          </div>
+          <div className="col-12 col-md-6">
+            <label className="form-label" htmlFor="create-last-name">Last Name</label>
+            <input id="create-last-name" className="form-control" name="lastName" autoComplete="family-name" pattern="[A-Za-z .'-]{2,50}" required />
+          </div>
           <div className="col-12">
             <label className="form-label" htmlFor="create-username">Username</label>
             <input
@@ -58,7 +67,7 @@ export class CreateAccountView extends Component {
             />
           </div>
           <div className="col-12 col-md-6">
-            <label className="form-label" htmlFor="create-street">Street (optional)</label>
+            <label className="form-label" htmlFor="create-street">Street</label>
             <input
               id="create-street"
               className="form-control"
@@ -66,10 +75,11 @@ export class CreateAccountView extends Component {
               autoComplete="address-line1"
               pattern="[A-Za-z0-9 .,'#-]{3,100}"
               title="Enter a street address between 3 and 100 characters."
+              required
             />
           </div>
           <div className="col-12 col-md-6">
-            <label className="form-label" htmlFor="create-city">City (optional)</label>
+            <label className="form-label" htmlFor="create-city">City</label>
             <input
               id="create-city"
               className="form-control"
@@ -77,10 +87,11 @@ export class CreateAccountView extends Component {
               autoComplete="address-level2"
               pattern="[A-Za-z .'-]{2,50}"
               title="Enter a city name between 2 and 50 letters."
+              required
             />
           </div>
           <div className="col-12 col-md-6">
-            <label className="form-label" htmlFor="create-state">State (optional)</label>
+            <label className="form-label" htmlFor="create-state">State</label>
             <input
               id="create-state"
               className="form-control"
@@ -88,10 +99,11 @@ export class CreateAccountView extends Component {
               autoComplete="address-level1"
               pattern="[A-Za-z]{2}"
               title="Enter the two-letter state abbreviation, such as CA."
+              required
             />
           </div>
           <div className="col-12 col-md-6">
-            <label className="form-label" htmlFor="create-zip">ZIP Code (optional)</label>
+            <label className="form-label" htmlFor="create-zip">ZIP Code</label>
             <input
               id="create-zip"
               className="form-control"
@@ -100,6 +112,7 @@ export class CreateAccountView extends Component {
               inputMode="numeric"
               pattern="[0-9]{5}(-[0-9]{4})?"
               title="Enter a 5-digit ZIP code, optionally followed by a 4-digit extension."
+              required
             />
           </div>
           <div className="col-12">
@@ -116,7 +129,7 @@ export class CreateAccountView extends Component {
             />
           </div>
           <div className="col-12 col-md-6">
-            <label className="form-label" htmlFor="create-phone">Phone (optional)</label>
+            <label className="form-label" htmlFor="create-phone">Phone</label>
             <input
               id="create-phone"
               className="form-control"
@@ -125,6 +138,7 @@ export class CreateAccountView extends Component {
               autoComplete="tel"
               pattern="(\+?1[ .-]?)?(\([0-9]{3}\)|[0-9]{3})[ .-]?[0-9]{3}[ .-]?[0-9]{4}"
               title="Enter a 10-digit US phone number, optionally including +1 and common separators."
+              required
             />
           </div>
           <div className="col-12">
