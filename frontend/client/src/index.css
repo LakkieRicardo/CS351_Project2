@@ -51,15 +51,15 @@ h6 {
   color: #222021 !important;
 }
 
-:root body .checkout-name-input {
-  color: #222021 !important;
-}
-
 :root body .login-button {
   color: #222021 !important;
 }
 
-:root body .account-view-content .form-control {
+:root body .form-control {
   color: #222021 !important;
   -webkit-text-fill-color: #222021;
+}
+
+:root body .form-control::placeholder {
+  color: #222021 !important;
 }

@@ -2,9 +2,9 @@ import { Component } from 'react';
 import CurrencyAmount from './CurrencyAmount';
 
 const variantStyles = {
-  Regular: { color: '#f0f9ff', background: '#075985', accent: '#38bdf8', fontFamily: 'Georgia, serif', fontWeight: 700 },
-  Enhanced: { color: '#f0fdf4', background: '#166534', accent: '#4ade80', fontFamily: 'Trebuchet MS, sans-serif', fontWeight: 700 },
-  Corrupted: { color: '#fff1f2', background: '#9d174d', accent: '#fb7185', fontFamily: 'Verdana, sans-serif', fontWeight: 700 },
+  Regular: { color: '#f0f9ff', background: '#075985', accent: '#38bdf8', fontWeight: 700 },
+  Enhanced: { color: '#f0fdf4', background: '#166534', accent: '#4ade80', fontWeight: 700 },
+  Corrupted: { color: '#fff1f2', background: '#9d174d', accent: '#fb7185', fontWeight: 700 },
 };
 
 const renderWithBreaks = (text = '') =>
@@ -125,7 +125,6 @@ class ProductCard extends Component {
             const style = variantStyles[variant] || {
               color: '#f8fafc',
               background: '#1f2937',
-              fontFamily: 'sans-serif',
               fontWeight: 600,
             };
 
@@ -138,7 +137,6 @@ class ProductCard extends Component {
                   '--variant-color': style.color,
                   '--variant-background': style.background,
                   '--variant-accent': style.accent || style.color,
-                  fontFamily: style.fontFamily,
                   fontWeight: style.fontWeight,
                 }}
                 onClick={(event) => {
