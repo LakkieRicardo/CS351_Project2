@@ -7,58 +7,61 @@ import { ProductDetailView } from './views/ProductDetailView';
 import { AccountView } from './views/AccountView';
 import { CreateAccountView } from './views/CreateAccountView';
 import { CartView } from './views/CartView';
+import { OrderConfirmationView } from './views/OrderConfirmationView';
+import { API_BASE_URL } from './api';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      users: [],
+      products: [],
       currentProduct: null,
       currentPage: 'Home',
       isMainPage: true,
-      isCartOpen: false,
       cart: [],
+      cartError: '',
+      isPlacingOrder: false,
+      lastOrder: null,
     };
   }
 
   componentDidMount() {
-    fetch(`${import.meta.env.BASE_URL}products.json`)
+    // Project 2 requirement: load products through Express from MongoDB.
+    fetch(`${API_BASE_URL}/api/products`)
       .then((response) => response.json())
       .then((data) => {
-        this.setState({ users: data });
+        this.setState({ products: data });
       })
       .catch((error) => {
         console.error('Failed to load products:', error);
       });
+    this.loadCart();
   }
 
-  componentDidUpdate(previousProps, previousState) {
-    if (previousState.isCartOpen !== this.state.isCartOpen) {
-      this.setPageScrollLock(this.state.isCartOpen);
+  loadCart = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/cart`, { credentials: 'include' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to load cart');
+      this.setState({ cart: this.normalizeCart(data.cart || []), cartError: '' });
+    } catch (error) {
+      console.error('Failed to load cart:', error);
+      this.setState({ cartError: error.message });
     }
-  }
+  };
 
-  componentWillUnmount() {
-    this.setPageScrollLock(false);
-  }
-
-  setPageScrollLock = (isLocked) => {
-    const shouldLock = isLocked && window.matchMedia('(max-width: 600px)').matches;
-
-    if (shouldLock && this.pageScrollY === undefined) {
-      this.pageScrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${this.pageScrollY}px`;
-      document.body.style.width = '100%';
-      return;
-    }
-
-    if (!shouldLock && this.pageScrollY !== undefined) {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      window.scrollTo(0, this.pageScrollY);
-      this.pageScrollY = undefined;
+  updateServerCart = async (url, options) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}${url}`, {
+        ...options,
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to update cart');
+      this.setState({ cart: this.normalizeCart(data.cart || []), cartError: '' });
+    } catch (error) {
+      this.setState({ cartError: error.message });
     }
   };
 
@@ -98,99 +101,85 @@ class App extends Component {
 
   addToCart = (product, variant, size) => {
     if (!variant || !size) {
-      return;
+      return Promise.resolve(false);
     }
 
-    const sizeMultiplier = size === 'Small' ? 0.5 : size === 'Large' ? 2 : 1;
-    const variantMultiplier = variant === 'Enhanced' ? 2 : 1;
-    const unitPrice = Number(product.salePrice) * sizeMultiplier * variantMultiplier;
+    return (async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/cart`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: product.id, variant, size }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to add item to cart');
 
-    this.setState((previousState) => {
-      const normalizedCart = this.normalizeCart(previousState.cart);
-      const stockLimit = Number(product.quantityInStock ?? Infinity);
-      const currentProductQuantity = normalizedCart
-        .filter((item) => item.productId === product.id)
-        .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-
-      if (currentProductQuantity >= stockLimit) {
-        return null;
+        this.setState({
+          cart: this.normalizeCart(data.cart || []),
+          cartError: '',
+          currentPage: 'Cart',
+          currentProduct: null,
+          isMainPage: true,
+        });
+        return true;
+      } catch (error) {
+        this.setState({
+          cartError: error.message,
+          currentPage: 'Cart',
+          currentProduct: null,
+          isMainPage: true,
+        });
+        return false;
       }
+    })();
+  };
 
-      const existingItem = normalizedCart.find(
-        (item) => item.productId === product.id && item.variant === variant && item.size === size,
-      );
-
-      const nextCart = existingItem
-        ? normalizedCart.map((item) =>
-            item.productId === product.id && item.variant === variant && item.size === size
-              ? { ...item, quantity: item.quantity + 1 }
-              : item,
-          )
-        : [
-            ...normalizedCart,
-            {
-              productId: product.id,
-              name: product.name,
-              image: product.image,
-              variant,
-              size,
-              salePrice: unitPrice,
-              quantityInStock: stockLimit,
-              quantity: 1,
-            },
-          ];
-
-      return {
-        cart: nextCart,
-        isCartOpen: true,
-      };
+  changeCartItemQuantity = (item, delta) => {
+    const quantity = Number(item.quantity) + delta;
+    if (quantity < 1) {
+      return this.removeCartItem(item);
+    }
+    return this.updateServerCart(`/api/cart/${encodeURIComponent(item.itemId)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ quantity }),
     });
   };
 
-  changeCartItemQuantity = (productId, variant, size, delta) => {
-    this.setState((previousState) => {
-      const normalizedCart = this.normalizeCart(previousState.cart);
-      const matchingItem = normalizedCart.find(
-        (item) => item.productId === productId && item.variant === variant && item.size === size,
-      );
-      const stockLimit = Number(matchingItem?.quantityInStock ?? Infinity);
-      const currentProductQuantity = normalizedCart
-        .filter((item) => item.productId === productId)
-        .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
-
-      if (delta > 0 && currentProductQuantity + delta > stockLimit) {
-        return null;
-      }
-
-      return {
-        cart: normalizedCart
-          .map((item) =>
-            item.productId === productId && item.variant === variant && item.size === size
-              ? { ...item, quantity: item.quantity + delta }
-              : item,
-          )
-          .filter((item) => item.quantity > 0),
-      };
+  removeCartItem = (item) => {
+    return this.updateServerCart(`/api/cart/${encodeURIComponent(item.itemId)}`, {
+      method: 'DELETE',
     });
   };
 
-  removeCartItem = (productId, variant, size) => {
-    this.setState((previousState) => {
-      const normalizedCart = this.normalizeCart(previousState.cart);
-
-      return {
-        cart: normalizedCart.filter(
-          (item) => !(item.productId === productId && item.variant === variant && item.size === size),
-        ),
-      };
-    });
+  placeOrder = async ({ firstName, lastName }) => {
+    this.setState({ isPlacingOrder: true, cartError: '' });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/orders`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to place order');
+      this.setState({
+        cart: [],
+        lastOrder: data.order,
+        currentPage: 'Order Confirmation',
+        isMainPage: false,
+        isPlacingOrder: false,
+      });
+    } catch (error) {
+      this.setState({ cartError: error.message, isPlacingOrder: false });
+    }
   };
 
   renderNavigation() {
-    const { currentPage, isCartOpen, cart } = this.state;
+    const { currentPage, cart } = this.state;
     const navItems = ['Home', 'Shop', 'Account'];
     const totalItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const activeAccent = isCartOpen || currentPage === 'Cart' ? 'cart-page' : `${currentPage.toLowerCase()}-page`;
+    const activeAccent = currentPage === 'Cart' ? 'cart-page' : `${currentPage.toLowerCase()}-page`;
 
     return (
       <aside className={`app-sidebar ${activeAccent}`}>
@@ -239,10 +228,10 @@ class App extends Component {
           <button
             type="button"
             className={`btn btn-sm app-navigation-button cart-toggle ${
-              isCartOpen || currentPage === 'Cart' ? 'cart-page-highlight btn-light' : 'btn-outline-light'
+              currentPage === 'Cart' ? 'cart-page-highlight btn-light' : 'btn-outline-light'
             }`}
-            onClick={() => this.setState((previousState) => ({ isCartOpen: !previousState.isCartOpen }))}
-            aria-label="Toggle cart"
+            onClick={() => this.changePage('Cart')}
+            aria-label="Cart"
           >
             <img
               src={`${import.meta.env.BASE_URL}survival.png`}
@@ -251,38 +240,13 @@ class App extends Component {
             />
             {totalItemCount > 0 && <span className="cart-count-badge">({totalItemCount})</span>}
           </button>
-
-          {isCartOpen && (
-            <div className="cart-panel">
-              <div className="card bg-dark border-secondary text-white shadow-lg">
-                <div className="card-header bg-dark border-secondary d-flex justify-content-between align-items-center">
-                  <span className="fw-semibold">Cart</span>
-                  <button
-                    type="button"
-                    className="btn-close btn-close-white"
-                    aria-label="Close cart"
-                    onClick={() => this.setState({ isCartOpen: false })}
-                  />
-                </div>
-                <div className="card-body p-3">
-                  <CartView
-                    products={cart}
-                    showTitle={false}
-                    onIncrease={(productId, variant, size) => this.changeCartItemQuantity(productId, variant, size, 1)}
-                    onDecrease={(productId, variant, size) => this.changeCartItemQuantity(productId, variant, size, -1)}
-                    onRemove={this.removeCartItem}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </aside>
     );
   }
 
   render() {
-    const { users, currentProduct, currentPage, isMainPage, cart } = this.state;
+    const { products, currentProduct, currentPage, isMainPage, cart } = this.state;
 
     if (currentProduct != null) {
       return (
@@ -321,7 +285,7 @@ class App extends Component {
                 <HomeView />
               ) : currentPage === 'Shop' ? (
                 <ShopView
-                  products={users}
+                  products={products}
                   onSelectProduct={this.openProduct}
                   onAddToCart={this.addToCart}
                   isMainPage={isMainPage}
@@ -333,9 +297,17 @@ class App extends Component {
               ) : currentPage === 'Cart' ? (
                 <CartView
                   products={cart}
-                  onIncrease={(productId, variant, size) => this.changeCartItemQuantity(productId, variant, size, 1)}
-                  onDecrease={(productId, variant, size) => this.changeCartItemQuantity(productId, variant, size, -1)}
+                  onIncrease={(item) => this.changeCartItemQuantity(item, 1)}
+                  onDecrease={(item) => this.changeCartItemQuantity(item, -1)}
                   onRemove={this.removeCartItem}
+                  onPlaceOrder={this.placeOrder}
+                  isPlacingOrder={this.state.isPlacingOrder}
+                  error={this.state.cartError}
+                />
+              ) : currentPage === 'Order Confirmation' ? (
+                <OrderConfirmationView
+                  order={this.state.lastOrder}
+                  onContinueShopping={() => this.changePage('Shop')}
                 />
               ) : (
                 <CreateAccountView />

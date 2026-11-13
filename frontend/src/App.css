@@ -523,7 +523,6 @@
 
 .cart-toggle {
   position: relative;
-  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -539,36 +538,6 @@
   font-size: 0.8rem;
   font-weight: 700;
   line-height: 1;
-}
-
-.cart-panel {
-  position: absolute;
-  bottom: 0;
-  left: calc(100% + 0.5rem);
-  width: min(360px, calc(100vw - 24px));
-  z-index: 20;
-}
-
-.cart-panel .card {
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.cart-panel .card-header {
-  padding: 0.75rem 1rem;
-}
-
-.cart-panel .container {
-  padding: 0 !important;
-}
-
-.cart-panel h2 {
-  font-size: 1.25rem;
-  margin-bottom: 0.75rem;
-}
-
-.cart-panel .d-flex.flex-column {
-  gap: 0.25rem;
 }
 
 .cart-item-row {
