@@ -20,6 +20,7 @@ class ProductCard extends Component {
     this.state = {
       selectedVariant: '',
       selectedSize: '',
+      isAddingToCart: false,
     };
   }
 
@@ -27,7 +28,7 @@ class ProductCard extends Component {
     const { product, onClick, onAddToCart, isMainPage } = this.props;
     const variants = product.variants || [];
     const sizes = product.sizes || ['Small', 'Medium', 'Large'];
-    const { selectedVariant, selectedSize } = this.state;
+    const { selectedVariant, selectedSize, isAddingToCart } = this.state;
     const canAddToCart = Boolean(selectedVariant && selectedSize && onAddToCart);
     const isLowStock = Number(product.quantityInStock) < 5;
     const hasTestimony = product.testimonyIcon || product.testimonyQuote || product.testimonySource;
@@ -182,15 +183,17 @@ class ProductCard extends Component {
         <button
           type="button"
           className="btn btn-light w-100 mt-auto"
-          disabled={!canAddToCart}
+          disabled={!canAddToCart || isAddingToCart}
           onClick={(event) => {
             event.stopPropagation();
             if (canAddToCart) {
-              onAddToCart(product, selectedVariant, selectedSize);
+              this.setState({ isAddingToCart: true });
+              Promise.resolve(onAddToCart(product, selectedVariant, selectedSize))
+                .finally(() => this.setState({ isAddingToCart: false }));
             }
           }}
         >
-          Add to cart
+          {isAddingToCart ? 'Adding…' : 'Add to cart'}
         </button>
         <hr />
       </div>

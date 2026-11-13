@@ -427,7 +427,6 @@
 
 .cart-toggle {
   position: relative;
-  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -443,36 +442,6 @@
   font-size: 0.8rem;
   font-weight: 700;
   line-height: 1;
-}
-
-.cart-panel {
-  position: absolute;
-  bottom: 0;
-  left: calc(100% + 0.5rem);
-  width: min(360px, calc(100vw - 24px));
-  z-index: 20;
-}
-
-.cart-panel .card {
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.cart-panel .card-header {
-  padding: 0.75rem 1rem;
-}
-
-.cart-panel .container {
-  padding: 0 !important;
-}
-
-.cart-panel h2 {
-  font-size: 1.25rem;
-  margin-bottom: 0.75rem;
-}
-
-.cart-panel .d-flex.flex-column {
-  gap: 0.25rem;
 }
 
 .cart-item-row {
@@ -512,48 +481,6 @@
 
   .app-navigation .btn {
     white-space: normal;
-  }
-
-  .cart-panel {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100vw;
-    max-width: none;
-    margin: 0;
-    padding: 1rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 30;
-  }
-
-  .cart-panel .card {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 0;
-    min-height: 0;
-    height: calc(100vh - 2rem);
-    height: calc(100dvh - 2rem);
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-  }
-
-  .cart-panel .card-body {
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-  }
-
-  .cart-panel .card-header {
-    padding: 1rem 1rem 0.75rem;
-    flex-shrink: 0;
   }
 }
 

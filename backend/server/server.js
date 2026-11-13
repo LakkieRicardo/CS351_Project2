@@ -7,6 +7,10 @@ import { createAccountController } from './controllers/accountController.js';
 import { createProductController } from './controllers/productController.js';
 import { createAccountRoutes } from './routes/accountRoutes.js';
 import { createProductRoutes } from './routes/productRoutes.js';
+import { createCartController } from './controllers/cartController.js';
+import { createOrderController } from './controllers/orderController.js';
+import { createCartRoutes } from './routes/cartRoutes.js';
+import { createOrderRoutes } from './routes/orderRoutes.js';
 
 dotenv.config();
 
@@ -16,8 +20,7 @@ const port = process.env.PORT || 5000;
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 
-// Project 2 requirement: use Express sessions so login state and the future
-// shopping cart can persist across requests for the current browser session.
+// Sessions keep login state and the shopping cart across requests.
 app.use(session({
   secret: process.env.SESSION_SECRET || 'development-session-secret',
   resave: false,
@@ -35,10 +38,21 @@ async function startServer() {
     // Required MongoDB collections: products, users, and orders.
     const productsCollection = database.collection('products');
     const usersCollection = database.collection('users');
+    const ordersCollection = database.collection('orders');
+    const countersCollection = database.collection('counters');
     const accountController = createAccountController(usersCollection);
     const productController = createProductController(productsCollection);
+    const cartController = createCartController(productsCollection);
+    const orderController = createOrderController(
+      usersCollection,
+      ordersCollection,
+      productsCollection,
+      countersCollection,
+    );
 
     app.use('/api', createAccountRoutes(accountController));
+    app.use('/api/cart', createCartRoutes(cartController));
+    app.use('/api/orders', createOrderRoutes(orderController));
     // Product data is served from MongoDB through Express, not products.json.
     app.use('/api/products', createProductRoutes(productController));
 

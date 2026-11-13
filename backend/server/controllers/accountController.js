@@ -7,7 +7,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function publicUser(user) {
   // Security requirement: never send passwordHash back to the React client.
   return {
-    id: user._id,
+    _id: user._id,
     username: user.username,
     email: user.email,
     phone: user.phone || '',
@@ -103,6 +103,7 @@ export function createAccountController(usersCollection) {
         console.error('Failed to log out:', error);
         return response.status(500).json({ error: 'Failed to log out' });
       }
+      response.clearCookie('connect.sid', { httpOnly: true, sameSite: 'lax' });
       response.json({ message: 'Logged out successfully' });
     });
   }
