@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Backend input validation</title>
+</head>
+<body>
+<main>
+  <h1>Backend input validation</h1>
+  <p>Request bodies are parsed by <code>express.json()</code> in <code>backend/server/server.js</code>. Input checks are implemented in the route's controller; there is no shared validation middleware. Invalid input is returned as a JSON <code>error</code> response before the corresponding write or session update.</p>
+
+  <h2>Account controller</h2>
+  <p><code>validateAccountInput</code> in <code>backend/server/controllers/accountController.js</code> is used by both account creation and profile updates:</p>
+  <table>
+    <thead><tr><th>Field</th><th>Check</th></tr></thead>
+    <tbody>
+      <tr><td><code>firstName</code>, <code>lastName</code>, <code>city</code></td><td>After trimming, 2–50 ASCII letters, spaces, <code>.</code>, <code>'</code>, or <code>-</code>.</td></tr>
+      <tr><td><code>username</code></td><td>3–20 ASCII letters, digits, or underscores.</td></tr>
+      <tr><td><code>email</code></td><td>Matches the controller's non-whitespace <code>local@domain.tld</code> pattern.</td></tr>
+      <tr><td><code>password</code></td><td>Required on creation; at least 8 characters. Not required on profile update.</td></tr>
+      <tr><td><code>phone</code></td><td>Matches the controller's US phone pattern, with optional country code <code>1</code> and supported separators.</td></tr>
+      <tr><td><code>street</code></td><td>At least 3 characters after trimming.</td></tr>
+      <tr><td><code>state</code></td><td>Exactly two letters after trimming. Stored uppercase.</td></tr>
+      <tr><td><code>zip</code></td><td>Five digits, optionally followed by <code>-</code> and four digits.</td></tr>
+    </tbody>
+  </table>
+  <p>Creation checks for an existing username and normalized lowercase email before inserting a user. A passing password is stored as a bcrypt hash. Profile updates run the same checks without requiring a password, check for username or email duplicates excluding the current user, then update the profile fields.</p>
+  <p>Login requires a username-or-email and password. It looks up the username or lowercase email and compares the password with the stored bcrypt hash. A successful login stores the user ID in the session.</p>
+
+  <h2>Product controller</h2>
+  <p><code>GET /api/products/:id</code> converts the path parameter to a number and requires an integer before querying <code>products.id</code>. Invalid IDs return <code>400</code>; a missing product returns <code>404</code>. <code>GET /api/products</code> returns the collection without accepting client-supplied data.</p>
+
+  <h2>Cart controller</h2>
+  <p><code>POST /api/cart</code> checks that <code>productId</code> converts to an integer and that <code>variant</code> and <code>size</code> are present. It then loads the product and checks the requested variant and size against the product document. If <code>sizes</code> is absent, the allowed sizes are <code>Small</code>, <code>Medium</code>, and <code>Large</code>.</p>
+  <p>The optional <code>quantity</code> defaults to <code>1</code>; its numeric value must be a positive integer. The controller checks the requested quantity plus quantities already in the session cart against the product's finite <code>quantityInStock</code>. Invalid input returns <code>400</code>; missing products return <code>404</code>; unavailable options or stock conflicts return <code>400</code> or <code>409</code>, respectively.</p>
+  <p><code>PUT /api/cart/:itemId</code> applies the same positive-integer quantity check, requires that the item exists in the current session, reloads its product, and checks the new quantity against stock and other cart entries for that product. <code>DELETE /api/cart/:itemId</code> only removes an item found in the current session.</p>
+  <p>Names, images, prices, and stock values written to cart items are read from MongoDB. The client does not supply those values.</p>
+
+  <h2>Order controller</h2>
+  <p><code>POST /api/orders</code> performs these checks before inserting an order:</p>
+  <ul>
+    <li>The session has a valid MongoDB user ID, and the user exists.</li>
+    <li><code>firstName</code> and <code>lastName</code> are strings that remain nonempty after trimming and are no longer than 50 characters.</li>
+    <li><code>cardType</code> is present; the card number contains 12–19 digits after non-digits are removed; the CVV contains 3 or 4 digits.</li>
+    <li>The session cart is not empty.</li>
+    <li>The user's profile has an email, a phone number with at least 10 digits, a nonempty street and city, a two-letter state, and a valid 5-digit or ZIP+4 ZIP code.</li>
+    <li>Every cart product still exists, aggregate quantities do not exceed finite stock, and each variant and size is still available.</li>
+    <li>The unit price recalculated from the product's <code>salePrice</code> is finite and nonnegative.</li>
+  </ul>
+  <p>Order item names, images, IDs, options, unit prices, and line totals are constructed or recalculated from the session cart and current product documents. Totals are calculated by the controller. Only <code>cardType</code> and the last four card digits are stored; the card number and CVV are not inserted. <code>cardType</code> is checked for presence but is not restricted to an allowed-value list.</p>
+  <p><code>GET /api/orders</code> requires a valid session user ID and queries only that user's orders. <code>GET /api/orders/:id</code> also requires the path ID to match <code>ORD-&lt;digits&gt;</code> and queries by both order ID and session user ID.</p>
+
+  <h2>Responses for rejected requests</h2>
+  <ul>
+    <li><code>400</code>: invalid field, option, quantity, or order ID; empty cart or incomplete checkout profile.</li>
+    <li><code>401</code>: invalid login credentials or missing or invalid login session.</li>
+    <li><code>404</code>: requested account, product, cart item, or order does not exist.</li>
+    <li><code>409</code>: duplicate account identity, stock conflict, or a cart product or option that is no longer available.</li>
+  </ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Frontend and backend on Google Cloud Run</title>
+</head>
+<body>
+<main>
+  <h1>Frontend and backend on Google Cloud Run</h1>
+  <p>The storefront and Express API run together as a single Cloud Run service. A Cloud Run revision contains one container and serves both the Vite-built site and the <code>/api</code> endpoints from the same origin.</p>
+
+  <h2>Repository deployment flow</h2>
+  <ol>
+    <li>A commit is pushed to the GitHub branch connected to Cloud Run.</li>
+    <li>The connected Cloud Build pipeline builds the root <code>Dockerfile</code>.</li>
+    <li>The Dockerfile builds the frontend, then packages its static output with the Express backend and its production dependencies.</li>
+    <li>Cloud Run starts the image as a new service revision.</li>
+  </ol>
+
+  <h2>Container layout</h2>
+  <p>The Dockerfile uses two Node.js build stages:</p>
+  <ul>
+    <li><strong>Frontend build stage:</strong> installs <code>frontend/client</code> dependencies and runs the Vite production build with <code>/</code> as its base path.</li>
+    <li><strong>Runtime stage:</strong> installs production dependencies from <code>backend/server</code>, copies the backend into <code>/app/backend</code>, and copies the built frontend into <code>/app/static</code>.</li>
+  </ul>
+  <p>The backend resolves its static directory as the sibling <code>static/</code> folder. Express serves those files and falls back to <code>index.html</code> for frontend routes. The existing API route handlers stay under <code>/api</code>; API requests and static content therefore share the Cloud Run service and origin.</p>
+
+  <h2>Runtime configuration</h2>
+  <p>Cloud Run provides <code>PORT</code> for the HTTP server; the container listens on port <code>8080</code> by default. Configure <code>MONGODB_URI</code> and <code>SESSION_SECRET</code> as runtime secrets in Secret Manager, not as files or values committed to Git.</p>
+  <p>For a single-host <code>mongodb://</code> URI that does not contain a port, set <code>MONGODB_PORT</code> to the MongoDB port. If omitted, MongoDB's standard port is used. Do not set <code>MONGODB_PORT</code> when the URI already contains its port or uses <code>mongodb+srv://</code>.</p>
+  <p>The backend connects to the <code>CS351Project2</code> database. Ensure the Cloud Run service can reach the MongoDB host and that the database's network rules allow the connection.</p>
+
+  <h2>Local development</h2>
+  <p>Local development remains separate: run Express from <code>backend/server</code> and Vite from <code>frontend/client</code>. The frontend's <code>.env.local</code> can set <code>VITE_API_BASE_URL=http://localhost:5000</code> to point Vite at the local backend. The root <code>deploy.ps1</code> is a local packaging helper; Cloud Run builds from the repository using the root Dockerfile.</p>
+</main>
+</body>
+</html>

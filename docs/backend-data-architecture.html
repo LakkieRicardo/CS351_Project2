@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Backend controllers and database</title>
+</head>
+<body>
+<main>
+  <h1>Backend controllers and database</h1>
+
+  <h2>Database</h2>
+  <p>The server connects to the <code>CS351Project2</code> MongoDB database. It uses four collections: <code>products</code>, <code>users</code>, <code>orders</code>, and <code>counters</code>.</p>
+
+  <h3><code>products</code></h3>
+  <p>Products are looked up by their numeric <code>id</code>. The backend reads these fields:</p>
+  <ul>
+    <li><code>id</code></li>
+    <li><code>name</code></li>
+    <li><code>image</code></li>
+    <li><code>price</code></li>
+    <li><code>salePrice</code></li>
+    <li><code>quantityInStock</code></li>
+    <li><code>variants</code></li>
+    <li><code>sizes</code> (defaults to <code>Small</code>, <code>Medium</code>, and <code>Large</code> if absent)</li>
+  </ul>
+  <p>The frontend catalog data in <code>frontend/client/public/products.json</code> also contains <code>rating</code>, <code>reviewCount</code>, <code>shortDescription</code>, <code>description</code>, and <code>popular</code>. Some catalog entries contain <code>testimonyIcon</code>, <code>testimonyQuote</code>, and <code>testimonySource</code>.</p>
+  <p>The cart and order controllers check product options and stock using <code>variants</code>, <code>sizes</code>, and <code>quantityInStock</code>. Cart and order prices are computed from <code>salePrice</code>.</p>
+
+  <h3><code>users</code></h3>
+  <p>Account creation inserts these fields:</p>
+  <pre><code>username
+email
+passwordHash
+firstName
+lastName
+phone
+shippingAddress
+  street
+  city
+  state
+  zip
+createdAt</code></pre>
+  <p><code>email</code> is stored lowercase, <code>state</code> uppercase, and <code>passwordHash</code> is created with bcrypt. Account updates change the username, email, name, phone, and shipping address; they do not update the password or <code>createdAt</code>. Account API responses omit <code>passwordHash</code>.</p>
+
+  <h3><code>orders</code></h3>
+  <p>Orders are inserted with this shape:</p>
+  <pre><code>_id                 "ORD-&lt;sequence&gt;"
+userId              user's MongoDB _id as a string
+orderDate
+customer
+  firstName
+  lastName
+  email
+  phone
+shippingAddress     copy of the user's shippingAddress
+payment
+  cardType
+  last4
+items[]             productId, name, image, variant, size,
+                    unitPrice, quantity, lineTotal
+totals
+  subtotal
+  shipping
+  taxes
+  total
+  itemCount
+status              "Submitted"</code></pre>
+  <p>Only the card type and final four card digits are stored in an order. Shipping is calculated at <code>$10</code> per item and tax at <code>8%</code> of the subtotal.</p>
+
+  <h3><code>counters</code></h3>
+  <p>The order controller uses one counter document:</p>
+  <pre><code>_id       "order-counter"
+sequence  starts at 1000 and increments for each order</code></pre>
+  <p>The incremented value produces order IDs beginning with <code>ORD-1001</code>.</p>
+
+  <h2>Session cart</h2>
+  <p>Cart data is stored in <code>request.session.cart</code>, not in a MongoDB collection. Each cart item has:</p>
+  <pre><code>itemId
+productId
+name
+image
+variant
+size
+salePrice
+quantityInStock
+quantity</code></pre>
+  <p><code>itemId</code> is a UUID. The session also stores <code>userId</code> after login. The server does not configure a MongoDB session store.</p>
+
+  <h2>Controllers and routes</h2>
+  <table>
+    <thead>
+      <tr><th>Controller</th><th>Routes</th><th>Database/session work</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Account</td><td><code>POST /api/accounts</code>, <code>POST /api/login</code>, <code>POST /api/logout</code>, <code>GET /api/account</code>, <code>PUT /api/account</code></td><td>Creates and updates users; stores the logged-in user ID in the session.</td></tr>
+      <tr><td>Product</td><td><code>GET /api/products</code>, <code>GET /api/products/:id</code></td><td>Reads product documents.</td></tr>
+      <tr><td>Cart</td><td><code>GET /api/cart</code>, <code>POST /api/cart</code>, <code>PUT /api/cart/:itemId</code>, <code>DELETE /api/cart/:itemId</code></td><td>Stores cart items in the session and checks product options and stock against <code>products</code>.</td></tr>
+      <tr><td>Order</td><td><code>POST /api/orders</code>, <code>GET /api/orders</code>, <code>GET /api/orders/:id</code></td><td>Creates orders from the session cart and user profile; reads orders belonging to the logged-in user; increments the order counter.</td></tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>
