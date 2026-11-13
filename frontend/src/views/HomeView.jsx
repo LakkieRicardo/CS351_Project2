@@ -19,17 +19,17 @@ export class HomeView extends Component {
             <p className="lead mb-0 mt-4">Mystic items for fighting, staying alive, and raising your spirits.</p>
           </div>
         </div>
-        <div className="home-rem-callout">
-          <div className="home-rem-text">
-            <p className="home-rem-name fw-bold mb-2">Rem</p>
-            <p className="home-rem-placeholder mb-0">
+        <div className="home-broker-callout">
+          <div className="home-broker-text">
+            <p className="home-broker-name fw-bold mb-2">Shopkeeper</p>
+            <p className="home-broker-placeholder mb-0">
               Click on the shop button to begin looking through our catalog!
             </p>
           </div>
           <img
-            src={`${import.meta.env.BASE_URL}rem-profile.png`}
-            alt="Rem"
-            className="home-rem-image"
+            src={`${import.meta.env.BASE_URL}broker.png`}
+            alt="broker"
+            className="home-broker-image"
           />
         </div>
       </div>

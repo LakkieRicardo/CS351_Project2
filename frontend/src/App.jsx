@@ -191,9 +191,10 @@ class App extends Component {
     const { currentPage, isCartOpen, cart } = this.state;
     const navItems = ['Home', 'Shop', 'Account'];
     const totalItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const activeAccent = isCartOpen || currentPage === 'Cart' ? 'cart-page' : `${currentPage.toLowerCase()}-page`;
 
     return (
-      <aside className="app-sidebar">
+      <aside className={`app-sidebar ${activeAccent}`}>
         <div className="nav-brand-mark">
           <button
             type="button"
@@ -207,7 +208,7 @@ class App extends Component {
             }}
             aria-label="Go to home page"
           >
-            <img src={`${import.meta.env.BASE_URL}rem-icon.png`} alt="Rem icon" className="rem-icon" />
+            <img src={`${import.meta.env.BASE_URL}deadlock-logo.png`} alt="Deadlock logo" className="nav-icon" />
           </button>
         </div>
         <hr className="border-secondary" />
@@ -216,10 +217,21 @@ class App extends Component {
             <button
               type="button"
               key={item}
-              className={currentPage === item ? 'btn btn-light btn-sm' : 'btn btn-outline-light btn-sm'}
+              className={`btn btn-sm app-navigation-button ${
+                currentPage === item ? `${item.toLowerCase()}-page-highlight` : ''
+              } ${
+                currentPage === item ? 'btn-light' : 'btn-outline-light'
+              }`}
               onClick={() => this.changePage(item)}
+              aria-label={item}
             >
-              {item}
+              <img
+                src={`${import.meta.env.BASE_URL}${
+                  item === 'Home' ? 'spirit.png' : item === 'Shop' ? 'gun.png' : 'movement.png'
+                }`}
+                alt=""
+                className="app-navigation-icon"
+              />
             </button>
           ))}
         </nav>
@@ -227,11 +239,17 @@ class App extends Component {
         <div className="sidebar-cart">
           <button
             type="button"
-            className="btn btn-outline-light btn-sm cart-toggle"
+            className={`btn btn-sm app-navigation-button cart-toggle ${
+              isCartOpen || currentPage === 'Cart' ? 'cart-page-highlight btn-light' : 'btn-outline-light'
+            }`}
             onClick={() => this.setState((previousState) => ({ isCartOpen: !previousState.isCartOpen }))}
             aria-label="Toggle cart"
           >
-            🛒
+            <img
+              src={`${import.meta.env.BASE_URL}survival.png`}
+              alt=""
+              className="app-navigation-icon"
+            />
             {totalItemCount > 0 && <span className="cart-count-badge">({totalItemCount})</span>}
           </button>
 
@@ -294,7 +312,7 @@ class App extends Component {
       <div className="bg-dark text-white min-vh-100">
         <div className="app-content-layout">
           {this.renderNavigation()}
-          <main className="app-main-content">
+          <main className={`app-main-content ${currentPage === 'Shop' ? 'shop-view-background' : ''}`}>
             <div className="container py-3">
               <hr className="border-secondary" />
               {currentPage === 'Home' ? (
