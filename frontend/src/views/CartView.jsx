@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { OrderHistory } from '../components/OrderHistory';
 
 const formatCurrency = (amount) =>
   Number(amount || 0).toLocaleString('en-US', {
@@ -29,7 +30,7 @@ class ProductPreview extends Component {
           <button
             type="button"
             className="btn btn-outline-light btn-sm cart-qty-btn"
-            onClick={() => onDecrease(product.productId, product.variant, product.size)}
+            onClick={onDecrease}
             aria-label={`Decrease quantity for ${product.name}`}
           >
             −
@@ -39,7 +40,7 @@ class ProductPreview extends Component {
             type="button"
             className="btn btn-outline-light btn-sm cart-qty-btn"
             disabled={!canIncrease}
-            onClick={() => onIncrease(product.productId, product.variant, product.size)}
+            onClick={onIncrease}
             aria-label={`Increase quantity for ${product.name}`}
           >
             +
@@ -47,7 +48,7 @@ class ProductPreview extends Component {
           <button
             type="button"
             className="btn btn-close btn-close-white cart-remove-btn"
-            onClick={() => onRemove(product.productId, product.variant, product.size)}
+            onClick={onRemove}
             aria-label={`Remove ${product.name} from cart`}
           />
         </div>
@@ -57,8 +58,26 @@ class ProductPreview extends Component {
 }
 
 export class CartView extends Component {
+  handlePlaceOrder = (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    this.props.onPlaceOrder({
+      firstName: formData.get('firstName'),
+      lastName: formData.get('lastName'),
+    });
+  };
+
   render() {
-    const { products = [], showTitle = true, onIncrease, onDecrease, onRemove } = this.props;
+    const {
+      products = [],
+      showTitle = true,
+      onIncrease,
+      onDecrease,
+      onRemove,
+      onPlaceOrder,
+      isPlacingOrder = false,
+      error = '',
+    } = this.props;
     const subtotal = products.reduce(
       (sum, product) => sum + Number(product.salePrice || 0) * Number(product.quantity || 0),
       0,
@@ -78,21 +97,22 @@ export class CartView extends Component {
     return (
       <div className="container py-3">
         {showTitle && <h2>Cart</h2>}
+        {error && <p className="text-danger" role="alert">{error}</p>}
         {products.length === 0 ? (
           <p className="text-secondary mb-0">Your cart is empty.</p>
         ) : (
           <div className="d-flex flex-column">
             {products.map((product) => (
-              <div key={`${product.productId}-${product.variant}-${product.size}`}>
+              <div key={product.itemId || `${product.productId}-${product.variant}-${product.size}`}>
                 <ProductPreview
                   product={product}
                   canIncrease={
                     (productQuantityById.get(product.productId) || 0) <
                     Number(product.quantityInStock ?? Infinity)
                   }
-                  onIncrease={onIncrease}
-                  onDecrease={onDecrease}
-                  onRemove={onRemove}
+                  onIncrease={() => onIncrease(product)}
+                  onDecrease={() => onDecrease(product)}
+                  onRemove={() => onRemove(product)}
                 />
                 <div className="text-end text-secondary mb-2">
                   Unit price: ${formatCurrency(product.salePrice)}
@@ -125,9 +145,41 @@ export class CartView extends Component {
                 <span>${formatCurrency(total)}</span>
               </div>
               <div className="text-secondary mt-2">Shipping + taxes included in total price.</div>
+              {onPlaceOrder && (
+                <form className="mt-3" onSubmit={this.handlePlaceOrder}>
+                  <div className="row g-2 mb-3">
+                    <div className="col-sm-6">
+                      <label className="form-label" htmlFor="checkout-first-name">First name</label>
+                      <input
+                        id="checkout-first-name"
+                        className="form-control"
+                        name="firstName"
+                        autoComplete="given-name"
+                        maxLength={50}
+                        required
+                      />
+                    </div>
+                    <div className="col-sm-6">
+                      <label className="form-label" htmlFor="checkout-last-name">Last name</label>
+                      <input
+                        id="checkout-last-name"
+                        className="form-control"
+                        name="lastName"
+                        autoComplete="family-name"
+                        maxLength={50}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <button type="submit" className="btn btn-light w-100" disabled={isPlacingOrder}>
+                    {isPlacingOrder ? 'Placing order…' : 'Place Order'}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         )}
+        <OrderHistory heading="Previous orders" />
       </div>
     );
   }
