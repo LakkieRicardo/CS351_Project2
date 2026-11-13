@@ -7,6 +7,7 @@ import { ProductDetailView } from './views/ProductDetailView';
 import { AccountView } from './views/AccountView';
 import { CreateAccountView } from './views/CreateAccountView';
 import { CartView } from './views/CartView';
+import { API_BASE_URL } from './api';
 
 class App extends Component {
   constructor(props) {
@@ -23,7 +24,7 @@ class App extends Component {
 
   componentDidMount() {
     // Project 2 requirement: load products through Express from MongoDB.
-    fetch('http://localhost:5000/api/products')
+    fetch(`${API_BASE_URL}/api/products`)
       .then((response) => response.json())
       .then((data) => {
         this.setState({ products: data });

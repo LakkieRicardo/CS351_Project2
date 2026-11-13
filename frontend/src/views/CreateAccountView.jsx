@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { API_BASE_URL } from '../api';
 
 export class CreateAccountView extends Component {
   state = { message: '', error: '', isSubmitting: false };
@@ -11,7 +12,7 @@ export class CreateAccountView extends Component {
 
     try {
       // send account data to Express for server validation.
-      const response = await fetch('http://localhost:5000/api/accounts', {
+      const response = await fetch(`${API_BASE_URL}/api/accounts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formValues),
