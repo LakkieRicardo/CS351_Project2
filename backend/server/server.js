@@ -14,6 +14,7 @@ import { createOrderRoutes } from './routes/orderRoutes.js';
 import { createProductRoutes } from './routes/productRoutes.js';
 import { createCartController } from './controllers/cartController.js';
 import { createCartRoutes } from './routes/cartRoutes.js';
+import { getMongoConnectionString } from './mongoConnection.js';
 
 dotenv.config();
 
@@ -34,7 +35,12 @@ app.use(session({
   cookie: { httpOnly: true, sameSite: 'lax' },
 }));
 
-const client = new MongoClient(process.env.MONGODB_URI);
+const client = new MongoClient(
+  getMongoConnectionString(
+    process.env.MONGODB_URI,
+    process.env.MONGODB_PORT,
+  ),
+);
 
 async function startServer() {
   try {
