@@ -1,6 +1,9 @@
 # Backend
 
 The Express API runs on port `5000` by default and requires `MONGODB_URI`.
+When packaged by the root `deploy.ps1` script, the server also serves the
+frontend from the sibling `static/` directory, including the SPA entry point
+for non-API routes. API routes remain under `/api`.
 
 ## API routes
 

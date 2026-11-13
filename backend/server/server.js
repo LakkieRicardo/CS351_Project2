@@ -1,8 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { existsSync } from 'node:fs';
 import session from 'express-session';
 import { MongoClient } from 'mongodb';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createAccountController } from './controllers/accountController.js';
 import { createOrderController } from './controllers/orderController.js';
 import { createProductController } from './controllers/productController.js';
@@ -16,6 +19,9 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
+const serverDirectory = path.dirname(fileURLToPath(import.meta.url));
+const staticDirectory = path.resolve(serverDirectory, '..', 'static');
+const indexFile = path.join(staticDirectory, 'index.html');
 
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
@@ -55,6 +61,23 @@ async function startServer() {
     app.use('/api/cart', createCartRoutes(cartController));
     // Product data is served from MongoDB through Express, not products.json.
     app.use('/api/products', createProductRoutes(productController));
+
+    app.use(express.static(staticDirectory));
+    if (existsSync(indexFile)) {
+      app.get('/{*path}', (request, response, next) => {
+        if (
+          request.path === '/api' ||
+          request.path.startsWith('/api/') ||
+          !request.accepts('html')
+        ) {
+          return next();
+        }
+
+        response.sendFile(indexFile, (error) => {
+          if (error) next(error);
+        });
+      });
+    }
 
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
