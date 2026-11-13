@@ -275,9 +275,12 @@ class App extends Component {
       <div className="bg-dark text-white min-vh-100">
         <div className="app-content-layout">
           {this.renderNavigation()}
-          <main className={`app-main-content ${currentPage === 'Shop' ? 'shop-view-background' : ''}`}>
+          <main
+            className={`app-main-content ${
+              currentPage === 'Shop' ? 'shop-view-background' : currentPage === 'Home' ? 'home-view-background' : ''
+            }`}
+          >
             <div className="container py-3">
-              <hr className="border-secondary" />
               {currentPage === 'Home' ? (
                 <HomeView />
               ) : currentPage === 'Shop' ? (

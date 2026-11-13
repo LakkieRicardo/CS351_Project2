@@ -10,6 +10,7 @@
   margin: 12px;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
   border-radius: 8px;
+  border-left: 5px solid #E1B10C;
   padding: 12px;
   background: #A67A49;
   box-sizing: border-box;
@@ -352,7 +353,20 @@
 
 .shop-view-background {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #A29175 0%, #574B3D 100%);
+  background: linear-gradient(to bottom, #A29175 0%, #514539 100%);
+}
+
+.shop-header {
+  display: block;
+  width: min(100%, 380px);
+  height: auto;
+  margin: 0 auto 1rem;
+  object-fit: contain;
+}
+
+.home-view-background {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #222021 0%, #0C0702 100%);
 }
 
 .nav-icon {
@@ -369,6 +383,88 @@
 
 .home-hero-title-block {
   margin-bottom: 1.5rem;
+}
+
+.home-hero-card {
+  min-height: 420px;
+  border-left: 5px solid #B867DE;
+}
+
+.home-title-intro {
+  min-width: 0;
+}
+
+.curiosity-shop-logo {
+  max-width: 100%;
+  height: auto;
+}
+
+.home-hero-invitation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.home-hero-arrow-sign {
+  width: 360px;
+  height: 300px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.home-hero-invitation-text {
+  max-width: 350px;
+  padding: 1rem;
+  border-left: 5px solid #B867DE;
+  background-color: #5F4A2E;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  font-size: 1.75rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.home-shopkeeper-testimony {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 2rem 0 0;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(239, 222, 191, 0.3);
+  border-left: 5px solid #B867DE;
+  border-radius: 16px;
+  background: #A67A49;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.home-broker-text {
+  flex: 1;
+}
+
+.home-broker-name {
+  font-family: 'ValveOracle', sans-serif;
+  font-size: 2.25rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.home-broker-testimony-text {
+  font-size: 1.5rem;
+  line-height: 1.6;
+}
+
+.home-broker-image {
+  width: 88px;
+  height: 88px;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  background-color: #5F4A2E;
+  border-left: 5px solid #B867DE;
+  flex-shrink: 0;
+  object-fit: contain;
 }
 
 .home-rem-callout,
@@ -469,21 +565,182 @@
 }
 
 @media (max-width: 600px) {
+  .app-content-layout {
+    flex-direction: column;
+  }
+
   .app-sidebar {
-    flex-basis: 160px;
-    padding: 0.75rem 0 0.75rem 0.5rem;
+    position: sticky;
+    z-index: 10;
+    top: 0;
+    flex-direction: row;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    height: auto;
+    padding: 0.5rem 0.75rem;
+    border-right: 0;
+    border-bottom: 50px solid #B08946;
+  }
+
+  .app-sidebar.home-page {
+    border-bottom-color: #B867DE;
+  }
+
+  .app-sidebar.shop-page {
+    border-bottom-color: #E1B10C;
+  }
+
+  .app-sidebar.account-page {
+    border-bottom-color: #57A6B6;
+  }
+
+  .app-sidebar.cart-page {
+    border-bottom-color: #A2CA3C;
+  }
+
+  .app-sidebar > hr {
+    display: none;
+  }
+
+  .nav-brand-mark {
+    flex: 0 0 auto;
+    margin: 0;
   }
 
   .nav-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .app-navigation {
+    flex-direction: row;
+    justify-content: center;
+    flex: 1;
+    min-width: 0;
+    gap: 0.25rem;
+  }
+
+  .app-navigation-button {
+    width: clamp(36px, 11vw, 48px);
+    flex: 0 0 clamp(36px, 11vw, 48px);
+  }
+
+  .sidebar-cart {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sidebar-cart .cart-toggle {
+    width: clamp(36px, 11vw, 48px);
   }
 
   .app-navigation .btn {
     white-space: normal;
+  }
+
+  .home-hero-card {
+    min-height: auto;
+  }
+
+  .home-title-intro {
+    padding: 0.75rem !important;
+  }
+
+  .home-hero-title-block {
+    margin-bottom: 0.75rem;
+  }
+
+  .curiosity-shop-logo {
+    width: min(100%, 240px);
+  }
+
+  .home-hero-invitation {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .home-hero-arrow-sign {
+    width: min(55vw, 200px);
+    height: auto;
+    max-height: 160px;
+  }
+
+  .home-hero-invitation-text {
+    max-width: 100%;
+    padding: 0.75rem;
+    font-size: clamp(1rem, 5vw, 1.4rem);
+  }
+
+  .home-shopkeeper-testimony {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 1rem;
+  }
+
+  .home-broker-name {
+    font-size: 1.5rem;
+  }
+
+  .home-broker-testimony-text {
+    font-size: 1rem;
+  }
+
+  .home-broker-image {
+    width: 64px;
+    height: 64px;
+    align-self: flex-end;
+  }
+
+  .cart-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    max-width: none;
+    margin: 0;
+    padding: 1rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 30;
+  }
+
+  .cart-panel .card {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    min-height: 0;
+    height: calc(100vh - 2rem);
+    height: calc(100dvh - 2rem);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+  }
+
+  .cart-panel .card-body {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .cart-panel .card-header {
+    padding: 1rem 1rem 0.75rem;
+    flex-shrink: 0;
   }
 }
 
   .curiosity-shop-logo {
     max-width : 100%;
   }
+  
