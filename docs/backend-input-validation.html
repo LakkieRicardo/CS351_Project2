@@ -41,7 +41,7 @@
   <p><code>POST /api/orders</code> performs these checks before inserting an order:</p>
   <ul>
     <li>The session has a valid MongoDB user ID, and the user exists.</li>
-    <li><code>firstName</code> and <code>lastName</code> are strings that remain nonempty after trimming and are no longer than 50 characters.</li>
+    <li>The signed-in user's saved <code>firstName</code> and <code>lastName</code> are nonempty after trimming and no longer than 50 characters.</li>
     <li><code>cardType</code> is present; the card number contains 12–19 digits after non-digits are removed; the CVV contains 3 or 4 digits.</li>
     <li>The session cart is not empty.</li>
     <li>The user's profile has an email, a phone number with at least 10 digits, a nonempty street and city, a two-letter state, and a valid 5-digit or ZIP+4 ZIP code.</li>

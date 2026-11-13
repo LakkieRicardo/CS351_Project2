@@ -29,12 +29,6 @@ export function createOrderController(usersCollection, ordersCollection, product
         return response.status(401).json({ error: 'You must be logged in to place an order' });
       }
 
-      const firstName = typeof request.body.firstName === 'string' ? request.body.firstName.trim() : '';
-      const lastName = typeof request.body.lastName === 'string' ? request.body.lastName.trim() : '';
-      if (!firstName || firstName.length > 50 || !lastName || lastName.length > 50) {
-        return response.status(400).json({ error: 'First and last name are required and must be 50 characters or fewer' });
-      }
-
       // accept payment details for the simulated checkout,
       // but store only card type and the last four digits.
       const { cardType, cardNumber, cvv } = request.body;
@@ -52,6 +46,11 @@ export function createOrderController(usersCollection, ordersCollection, product
       const user = await usersCollection.findOne({ _id: new ObjectId(request.session.userId) });
       if (!user) {
         return response.status(404).json({ error: 'Account not found' });
+      }
+      const firstName = typeof user.firstName === 'string' ? user.firstName.trim() : '';
+      const lastName = typeof user.lastName === 'string' ? user.lastName.trim() : '';
+      if (!firstName || firstName.length > 50 || !lastName || lastName.length > 50) {
+        return response.status(400).json({ error: 'Complete your profile with a valid first and last name before checkout' });
       }
       if (!hasCompleteCheckoutProfile(user)) {
         return response.status(400).json({ error: 'Complete your profile with a valid phone number and shipping address before checkout' });

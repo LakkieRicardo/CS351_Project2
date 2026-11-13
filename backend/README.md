@@ -28,8 +28,8 @@ for non-API routes. API routes remain under `/api`.
 | POST | `/api/cart` | Add a product selection; JSON: `{ "productId": 1, "variant": "Regular", "size": "Medium" }` |
 | PUT | `/api/cart/:itemId` | Set an item's quantity; JSON: `{ "quantity": 2 }` |
 | DELETE | `/api/cart/:itemId` | Remove a cart item |
-| POST | `/api/orders` | Place an order using checkout first/last name and the signed-in user's saved contact and shipping details |
+| POST | `/api/orders` | Place an order using the signed-in user's saved name, contact, and shipping details |
 | GET | `/api/orders` | List the signed-in user's orders |
 | GET | `/api/orders/:id` | Get one of the signed-in user's orders |
 
-Cart and order requests should include the Express session cookie. `POST /api/orders` accepts JSON `{ "firstName": "Ben", "lastName": "Shah" }` and also requires a logged-in user with email, phone, street, city, two-letter state, and ZIP code saved on their account. Order documents receive sequential IDs starting at `ORD-1001`, store the order date, customer details, items, shipping address, and totals in the `orders` collection. Order totals use the cart's pricing rules: $10 shipping per item and 8% tax on the subtotal.
+Cart and order requests should include the Express session cookie. `POST /api/orders` accepts the checkout payment fields and uses the logged-in user's saved name, email, phone, and shipping address. The account must have a valid first and last name, phone number, and shipping address. Order documents receive sequential IDs starting at `ORD-1001`, store the order date, customer details, items, shipping address, and totals in the `orders` collection. Order totals use the cart's pricing rules: $10 shipping per item and 8% tax on the subtotal.

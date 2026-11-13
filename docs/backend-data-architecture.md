@@ -79,6 +79,9 @@ totals
 status              "Submitted"
 ```
 
+The customer name, email, and phone are copied from the signed-in user's
+profile.
+
 Only the card type and final four card digits are stored in an order. Shipping
 is calculated at `$10` per item and tax at `8%` of the subtotal.
 
