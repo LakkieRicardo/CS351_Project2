@@ -107,6 +107,10 @@
   color: #aaa;
 }
 
+.sale-font .currency-amount {
+  text-decoration: line-through;
+}
+
 .product-rating-value {
   color: #facc15;
   font-weight: 700;
@@ -351,7 +355,8 @@
   min-width: 0;
 }
 
-.shop-view-background {
+.shop-view-background,
+.cart-view-background {
   min-height: 100vh;
   background: linear-gradient(to bottom, #A29175 0%, #514539 100%);
 }
@@ -367,6 +372,19 @@
 .home-view-background {
   min-height: 100vh;
   background: linear-gradient(to bottom, #222021 0%, #0C0702 100%);
+}
+
+.account-view-background {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #222021 0%, #0C0702 100%);
+}
+
+.account-view-content .card {
+  border: 1px solid rgba(239, 222, 191, 0.3) !important;
+  border-left: 5px solid #57A6B6 !important;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #3F5D4D 0%, #2F4442 100%) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .nav-icon {
@@ -534,17 +552,48 @@
   bottom: 0.1rem;
   display: inline-block;
   min-width: 1.25rem;
-  color: #f8f9fa;
+  color: #222021 !important;
+  font-family: 'ValveOracle', sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
   line-height: 1;
 }
 
+.currency-amount {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2em;
+  white-space: nowrap;
+}
+
+.souls-currency-icon {
+  width: 1em;
+  height: 1em;
+  object-fit: contain;
+  vertical-align: -0.12em;
+}
+
+.cart-view-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cart-title-icon {
+  width: 1.5em;
+  height: 1.5em;
+  object-fit: contain;
+}
+
 .cart-item-row {
+  --app-text-color: #222021;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  background: #A67A49;
+  border-left: 5px solid #A2CA3C !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .cart-qty-btn {

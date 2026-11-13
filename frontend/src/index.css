@@ -41,3 +41,25 @@ h6 {
 :root body *::placeholder {
   color: var(--app-text-color) !important;
 }
+
+:root body .cart-count-badge {
+  color: #222021 !important;
+  font-family: 'ValveOracle', sans-serif;
+}
+
+:root body .place-order-button {
+  color: #222021 !important;
+}
+
+:root body .checkout-name-input {
+  color: #222021 !important;
+}
+
+:root body .login-button {
+  color: #222021 !important;
+}
+
+:root body .account-view-content .form-control {
+  color: #222021 !important;
+  -webkit-text-fill-color: #222021;
+}
