@@ -1,6 +1,14 @@
 # Backend
 
-The Express API runs on port `5000` by default and requires `MONGODB_URI`.
+The Express API listens on `PORT` (default `5000`) and requires `MONGODB_URI`.
+For a single-host `mongodb://` URI without a port, optionally set
+`MONGODB_PORT` to the database port; MongoDB's standard port is used when it
+is omitted. Do not set `MONGODB_PORT` if the URI already includes a port or
+uses `mongodb+srv://`.
+See [backend data architecture](../docs/backend-data-architecture.md) for
+collection fields and controller responsibilities, and
+[backend input validation](../docs/backend-input-validation.md) for the checks
+performed before client data is used.
 When packaged by the root `deploy.ps1` script, the server also serves the
 frontend from the sibling `static/` directory, including the SPA entry point
 for non-API routes. API routes remain under `/api`.
