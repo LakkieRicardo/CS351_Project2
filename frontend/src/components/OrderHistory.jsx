@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { API_BASE_URL } from '../api';
+import CurrencyAmount from './CurrencyAmount';
 
 const formatCurrency = (amount) =>
   Number(amount || 0).toLocaleString('en-US', {
@@ -54,7 +55,7 @@ export class OrderHistory extends Component {
                   <strong>{order._id}</strong>
                   <div className="text-secondary">{formatOrderDate(order.orderDate)}</div>
                 </div>
-                <strong>${formatCurrency(order.totals?.total)}</strong>
+                <strong><CurrencyAmount value={formatCurrency(order.totals?.total)} /></strong>
               </div>
               <ul className="mb-0 mt-3">
                 {(order.items || []).map((item, index) => (

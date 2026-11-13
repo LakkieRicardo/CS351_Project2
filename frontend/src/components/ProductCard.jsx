@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import CurrencyAmount from './CurrencyAmount';
 
 const variantStyles = {
   Regular: { color: '#f0f9ff', background: '#075985', accent: '#38bdf8', fontFamily: 'Georgia, serif', fontWeight: 700 },
@@ -92,7 +93,8 @@ class ProductCard extends Component {
         </div>
         <h4>{product.name}</h4>
         <p>
-          <s className="sale-font">${product.price}</s> ${product.salePrice}
+          <s className="sale-font"><CurrencyAmount value={product.price} /></s>{' '}
+          <CurrencyAmount value={product.salePrice} />
         </p>
         <p className="product-rating mb-1">
           <span className="product-rating-value" aria-label={`${product.rating} out of 5 stars`}>

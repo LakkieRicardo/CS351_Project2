@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { OrderHistory } from '../components/OrderHistory';
+import CurrencyAmount from '../components/CurrencyAmount';
 
 const formatCurrency = (amount) =>
   Number(amount || 0).toLocaleString('en-US', {
@@ -64,7 +65,7 @@ export class OrderConfirmationView extends Component {
                       </div>
                     </div>
                   </div>
-                  <strong>${formatCurrency(item.lineTotal)}</strong>
+                  <strong><CurrencyAmount value={formatCurrency(item.lineTotal)} /></strong>
                 </div>
               ))}
 
@@ -88,16 +89,16 @@ export class OrderConfirmationView extends Component {
 
               <div className="border-top border-secondary pt-3 mt-4 ms-auto" style={{ maxWidth: '24rem' }}>
                 <div className="d-flex justify-content-between">
-                  <span>Subtotal</span><span>${formatCurrency(totals.subtotal)}</span>
+                  <span>Subtotal</span><CurrencyAmount value={formatCurrency(totals.subtotal)} />
                 </div>
                 <div className="d-flex justify-content-between text-secondary mt-1">
-                  <span>Shipping</span><span>${formatCurrency(totals.shipping)}</span>
+                  <span>Shipping</span><CurrencyAmount value={formatCurrency(totals.shipping)} />
                 </div>
                 <div className="d-flex justify-content-between text-secondary mt-1">
-                  <span>Taxes</span><span>${formatCurrency(totals.taxes)}</span>
+                  <span>Taxes</span><CurrencyAmount value={formatCurrency(totals.taxes)} />
                 </div>
                 <div className="d-flex justify-content-between fw-bold fs-5 mt-3">
-                  <span>Total</span><span>${formatCurrency(totals.total)}</span>
+                  <span>Total</span><CurrencyAmount value={formatCurrency(totals.total)} />
                 </div>
               </div>
             </div>

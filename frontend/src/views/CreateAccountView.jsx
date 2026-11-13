@@ -29,7 +29,7 @@ export class CreateAccountView extends Component {
   render() {
     const { message, error, isSubmitting } = this.state;
     return (
-      <div className="container py-3">
+      <div className="container py-3 account-view-content">
         <h2>Create Account</h2>
         <form className="card bg-dark text-white border-secondary p-3" onSubmit={this.handleSubmit}>
           <div className="row g-3">
@@ -129,7 +129,7 @@ export class CreateAccountView extends Component {
             />
           </div>
           <div className="col-12">
-            <button type="submit" className="btn btn-light" disabled={isSubmitting}>Create Account</button>
+            <button type="submit" className="btn btn-light login-button" disabled={isSubmitting}>Create Account</button>
             {message && <p className="text-success mb-0">{message}</p>}
             {error && <p className="text-danger mb-0">{error}</p>}
           </div>

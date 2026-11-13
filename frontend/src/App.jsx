@@ -179,7 +179,8 @@ class App extends Component {
     const { currentPage, cart } = this.state;
     const navItems = ['Home', 'Shop', 'Account'];
     const totalItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const activeAccent = currentPage === 'Cart' ? 'cart-page' : `${currentPage.toLowerCase()}-page`;
+    const activePage = currentPage === 'Create Account' ? 'Account' : currentPage;
+    const activeAccent = activePage === 'Cart' ? 'cart-page' : `${activePage.toLowerCase()}-page`;
 
     return (
       <aside className={`app-sidebar ${activeAccent}`}>
@@ -206,9 +207,9 @@ class App extends Component {
               type="button"
               key={item}
               className={`btn btn-sm app-navigation-button ${
-                currentPage === item ? `${item.toLowerCase()}-page-highlight` : ''
+                activePage === item ? `${item.toLowerCase()}-page-highlight` : ''
               } ${
-                currentPage === item ? 'btn-light' : 'btn-outline-light'
+                activePage === item ? 'btn-light' : 'btn-outline-light'
               }`}
               onClick={() => this.changePage(item)}
               aria-label={item}
@@ -238,7 +239,7 @@ class App extends Component {
               alt=""
               className="app-navigation-icon"
             />
-            {totalItemCount > 0 && <span className="cart-count-badge">({totalItemCount})</span>}
+            {totalItemCount > 0 && <span className="cart-count-badge">{totalItemCount}</span>}
           </button>
         </div>
       </aside>
@@ -277,7 +278,16 @@ class App extends Component {
           {this.renderNavigation()}
           <main
             className={`app-main-content ${
-              currentPage === 'Shop' ? 'shop-view-background' : currentPage === 'Home' ? 'home-view-background' : ''
+              currentPage === 'Shop'
+                ? 'shop-view-background'
+                : currentPage === 'Home'
+                  ? 'home-view-background'
+                  : currentPage === 'Account'
+                    || currentPage === 'Create Account'
+                    ? 'account-view-background'
+                  : currentPage === 'Cart'
+                    ? 'cart-view-background'
+                    : ''
             }`}
           >
             <div className="container py-3">

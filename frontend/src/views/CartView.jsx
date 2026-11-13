@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { OrderHistory } from '../components/OrderHistory';
+import CurrencyAmount from '../components/CurrencyAmount';
 
 const formatCurrency = (amount) =>
   Number(amount || 0).toLocaleString('en-US', {
@@ -96,7 +97,12 @@ export class CartView extends Component {
 
     return (
       <div className="container py-3">
-        {showTitle && <h2>Cart</h2>}
+        {showTitle && (
+          <h2 className="cart-view-title">
+          Cart
+          <img src={`${import.meta.env.BASE_URL}soul-urn.png`} alt="" className="cart-title-icon" />
+          </h2>
+        )}
         {error && <p className="text-danger" role="alert">{error}</p>}
         {products.length === 0 ? (
           <p className="text-secondary mb-0">Your cart is empty.</p>
@@ -115,10 +121,11 @@ export class CartView extends Component {
                   onRemove={() => onRemove(product)}
                 />
                 <div className="text-end text-secondary mb-2">
-                  Unit price: ${formatCurrency(product.salePrice)}
+                  Unit price: <CurrencyAmount value={formatCurrency(product.salePrice)} />
                 </div>
                 <div className="text-end text-secondary mb-2">
-                  Line total: ${formatCurrency(Number(product.salePrice || 0) * Number(product.quantity || 0))}
+                  Line total:{' '}
+                  <CurrencyAmount value={formatCurrency(Number(product.salePrice || 0) * Number(product.quantity || 0))} />
                 </div>
               </div>
             ))}
@@ -126,15 +133,15 @@ export class CartView extends Component {
             <div className="border-top border-secondary pt-3 mt-2 text-white">
               <div className="d-flex justify-content-between">
                 <span>Subtotal</span>
-                <span>${formatCurrency(subtotal)}</span>
+                <CurrencyAmount value={formatCurrency(subtotal)} />
               </div>
               <div className="d-flex justify-content-between text-secondary mt-1">
                 <span>Shipping</span>
-                <span>${formatCurrency(shipping)}</span>
+                <CurrencyAmount value={formatCurrency(shipping)} />
               </div>
               <div className="d-flex justify-content-between text-secondary mt-1">
                 <span>Taxes</span>
-                <span>${formatCurrency(taxes)}</span>
+                <CurrencyAmount value={formatCurrency(taxes)} />
               </div>
               <div className="d-flex justify-content-between text-secondary mt-1">
                 <span>Items</span>
@@ -142,7 +149,7 @@ export class CartView extends Component {
               </div>
               <div className="d-flex justify-content-between mt-3 fw-bold fs-5">
                 <span>Total</span>
-                <span>${formatCurrency(total)}</span>
+                <CurrencyAmount value={formatCurrency(total)} />
               </div>
               <div className="text-secondary mt-2">Shipping + taxes included in total price.</div>
               {onPlaceOrder && (
@@ -152,7 +159,7 @@ export class CartView extends Component {
                       <label className="form-label" htmlFor="checkout-first-name">First name</label>
                       <input
                         id="checkout-first-name"
-                        className="form-control"
+                        className="form-control checkout-name-input"
                         name="firstName"
                         autoComplete="given-name"
                         maxLength={50}
@@ -163,7 +170,7 @@ export class CartView extends Component {
                       <label className="form-label" htmlFor="checkout-last-name">Last name</label>
                       <input
                         id="checkout-last-name"
-                        className="form-control"
+                        className="form-control checkout-name-input"
                         name="lastName"
                         autoComplete="family-name"
                         maxLength={50}
@@ -171,7 +178,11 @@ export class CartView extends Component {
                       />
                     </div>
                   </div>
-                  <button type="submit" className="btn btn-light w-100" disabled={isPlacingOrder}>
+                  <button
+                    type="submit"
+                    className="btn btn-light w-100 mt-auto place-order-button"
+                    disabled={isPlacingOrder}
+                  >
                     {isPlacingOrder ? 'Placing order…' : 'Place Order'}
                   </button>
                 </form>

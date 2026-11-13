@@ -83,7 +83,7 @@ export class AccountView extends Component {
     const address = user?.shippingAddress || {};
 
     return (
-      <div className="container py-3">
+      <div className="container py-3 account-view-content">
         {isLoadingAccount ? (
           <>
             <h2>Account</h2>
@@ -135,7 +135,7 @@ export class AccountView extends Component {
                 <label className="form-label" htmlFor="login-username">Username</label>
                 <input
                   id="login-username"
-                  className="form-control"
+                  className="form-control checkout-name-input"
                   name="username"
                   autoComplete="username"
                   required
@@ -145,7 +145,7 @@ export class AccountView extends Component {
                 <label className="form-label" htmlFor="login-password">Password</label>
                 <input
                   id="login-password"
-                  className="form-control"
+                  className="form-control checkout-name-input"
                   name="password"
                   type="password"
                   autoComplete="current-password"
@@ -154,7 +154,7 @@ export class AccountView extends Component {
               </div>
               <button
                 type="submit"
-                className="btn btn-light"
+                className="btn btn-light login-button"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? 'Logging in…' : 'Log In'}
