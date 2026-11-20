@@ -1,5 +1,7 @@
 # CS-351 Project 2
 
+website: https://cs351-project2-git-566860508281.us-central1.run.app/
+
 A React/Vite storefront served by an Express API, designed to deploy as one
 service on Google Cloud Run. The root `Dockerfile` builds the frontend and
 packages it with the backend; Express serves the static site and `/api`
