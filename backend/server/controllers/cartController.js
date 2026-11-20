@@ -1,17 +1,15 @@
 import { randomUUID } from 'node:crypto';
+import { getUnitPrice, normalizePrice } from '../priceUtils.js';
 
 const availableSizes = (product) => product.sizes || ['Small', 'Medium', 'Large'];
-const roundCurrency = (amount) => Math.round((amount + Number.EPSILON) * 100) / 100;
-
-function getUnitPrice(product, size, variant) {
-  const sizeMultiplier = size === 'Small' ? 0.5 : size === 'Large' ? 2 : 1;
-  const variantMultiplier = variant === 'Enhanced' ? 2 : 1;
-  return roundCurrency(Number(product.salePrice) * sizeMultiplier * variantMultiplier);
-}
 
 export function createCartController(productsCollection) {
   function getCart(request, response) {
-    response.json({ cart: request.session.cart || [] });
+    const cart = (request.session.cart || []).map((item) => ({
+      ...item,
+      salePrice: normalizePrice(item.salePrice),
+    }));
+    response.json({ cart });
   }
 
   async function addToCart(request, response) {
@@ -49,7 +47,11 @@ export function createCartController(productsCollection) {
 
       if (matchingItem) {
         request.session.cart = cart.map((item) => item.itemId === matchingItem.itemId
-          ? { ...item, quantity: item.quantity + quantityToAdd }
+          ? {
+              ...item,
+              quantity: item.quantity + quantityToAdd,
+              salePrice: getUnitPrice(product, size, variant),
+            }
           : item);
       } else {
         request.session.cart = [
@@ -101,7 +103,7 @@ export function createCartController(productsCollection) {
       }
 
       request.session.cart = cart.map((entry) => entry.itemId === itemId
-        ? { ...entry, quantity, quantityInStock: stock }
+        ? { ...entry, quantity, quantityInStock: stock, salePrice: getUnitPrice(product, entry.size, entry.variant) }
         : entry);
       response.json({ cart: request.session.cart });
     } catch (error) {

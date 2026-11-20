@@ -1,13 +1,7 @@
 import { ObjectId } from 'mongodb';
+import { getUnitPrice, normalizePrice } from '../priceUtils.js';
 
-const roundCurrency = (amount) => Math.round((amount + Number.EPSILON) * 100) / 100;
 const availableSizes = (product) => product.sizes || ['Small', 'Medium', 'Large'];
-
-function getUnitPrice(product, size, variant) {
-  const sizeMultiplier = size === 'Small' ? 0.5 : size === 'Large' ? 2 : 1;
-  const variantMultiplier = variant === 'Enhanced' ? 2 : 1;
-  return roundCurrency(Number(product.salePrice) * sizeMultiplier * variantMultiplier);
-}
 
 function getLastFour(cardNumber) {
   return cardNumber.replace(/\D/g, '').slice(-4);
@@ -99,7 +93,7 @@ export function createOrderController(usersCollection, ordersCollection, product
           size: item.size,
           unitPrice,
           quantity: item.quantity,
-          lineTotal: roundCurrency(unitPrice * item.quantity),
+          lineTotal: normalizePrice(unitPrice * item.quantity),
         };
       });
       if (orderItems.some((item) => item === null)) {
@@ -107,10 +101,10 @@ export function createOrderController(usersCollection, ordersCollection, product
       }
 
       const itemCount = orderItems.reduce((sum, item) => sum + item.quantity, 0);
-      const subtotal = roundCurrency(orderItems.reduce((sum, item) => sum + item.lineTotal, 0));
-      const shipping = roundCurrency(itemCount * 10);
-      const taxes = roundCurrency(subtotal * 0.08);
-      const total = roundCurrency(subtotal + shipping + taxes);
+      const subtotal = normalizePrice(orderItems.reduce((sum, item) => sum + item.lineTotal, 0));
+      const shipping = normalizePrice(itemCount * 10);
+      const taxes = normalizePrice(subtotal * 0.08);
+      const total = normalizePrice(subtotal + shipping + taxes);
 
       await countersCollection.updateOne(
         { _id: 'order-counter' },

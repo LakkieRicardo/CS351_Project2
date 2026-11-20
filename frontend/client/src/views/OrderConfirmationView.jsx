@@ -107,7 +107,7 @@ export class OrderConfirmationView extends Component {
 
         <OrderHistory />
 
-        <button type="button" className="btn btn-light mt-3" onClick={onContinueShopping}>
+        <button type="button" className="btn btn-light mt-3 continue-shopping-button" onClick={onContinueShopping}>
           Continue Shopping
         </button>
       </div>

@@ -4,8 +4,8 @@ import CurrencyAmount from '../components/CurrencyAmount';
 
 const formatCurrency = (amount) =>
   Number(amount || 0).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   });
 
 class ProductPreview extends Component {
@@ -80,10 +80,10 @@ export class CartView extends Component {
       isPlacingOrder = false,
       error = '',
     } = this.props;
-    const subtotal = products.reduce(
-      (sum, product) => sum + Number(product.salePrice || 0) * Number(product.quantity || 0),
+    const subtotal = Math.round(products.reduce(
+      (sum, product) => sum + Math.round(Number(product.salePrice || 0)) * Number(product.quantity || 0),
       0,
-    );
+    ));
     const itemCount = products.reduce((sum, product) => sum + Number(product.quantity || 0), 0);
     const productQuantityById = products.reduce((quantities, product) => {
       quantities.set(
@@ -93,8 +93,8 @@ export class CartView extends Component {
       return quantities;
     }, new Map());
     const shipping = itemCount * 10;
-    const taxes = subtotal * 0.08;
-    const total = subtotal + shipping + taxes;
+    const taxes = Math.round(subtotal * 0.08);
+    const total = Math.round(subtotal + shipping + taxes);
 
     return (
       <div className="container py-3">

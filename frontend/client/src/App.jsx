@@ -292,7 +292,11 @@ class App extends Component {
           >
             <div className="container py-3">
               {currentPage === 'Home' ? (
-                <HomeView />
+                <HomeView
+                  products={products}
+                  onSelectProduct={this.openProduct}
+                  onGoToShop={() => this.changePage('Shop')}
+                />
               ) : currentPage === 'Shop' ? (
                 <ShopView
                   products={products}

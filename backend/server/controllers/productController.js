@@ -1,9 +1,11 @@
+import { normalizeProductPrices } from '../priceUtils.js';
+
 export function createProductController(productsCollection) {
   // return the complete products collection as JSON.
   async function getProducts(request, response) {
     try {
       const products = await productsCollection.find({}).toArray();
-      response.json(products);
+      response.json(products.map(normalizeProductPrices));
     } catch (error) {
       console.error('Failed to retrieve products:', error);
       response.status(500).json({ error: 'Failed to retrieve products' });
@@ -22,7 +24,7 @@ export function createProductController(productsCollection) {
       if (!product) {
         return response.status(404).json({ error: 'Product not found' });
       }
-      response.json(product);
+      response.json(normalizeProductPrices(product));
     } catch (error) {
       console.error('Failed to retrieve product:', error);
       response.status(500).json({ error: 'Failed to retrieve product' });

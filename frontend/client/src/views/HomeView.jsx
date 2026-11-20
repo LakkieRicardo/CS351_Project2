@@ -1,7 +1,13 @@
 import { Component } from 'react';
+import CurrencyAmount from '../components/CurrencyAmount';
 
 export class HomeView extends Component {
   render() {
+    const { products = [], onSelectProduct, onGoToShop } = this.props;
+    const testimonialProducts = products
+      .filter((product) => product.testimonyQuote || product.testimonySource)
+      .slice(0, 4);
+
     return (
       <div className="mt-4">
         <div
@@ -41,6 +47,71 @@ export class HomeView extends Component {
             className="home-broker-image"
           />
         </article>
+        {testimonialProducts.length > 0 && (
+          <section className="home-shop-preview" aria-labelledby="home-shop-preview-heading">
+            <div className="home-shop-preview-header">
+              <div>
+                <h2 id="home-shop-preview-heading" className="home-shop-preview-title mb-0">
+                  Testimonies from our valued customers!
+                </h2>
+              </div>
+              <button type="button" className="btn home-shop-preview-button" onClick={onGoToShop}>
+                Visit the shop
+              </button>
+            </div>
+            <div className="home-shop-preview-grid">
+              {testimonialProducts.map((product) => (
+                <article
+                  className="home-shop-preview-card"
+                  key={product.id}
+                  onClick={() => onSelectProduct?.(product)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      onSelectProduct?.(product);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`View ${product.name}`}
+                >
+                  <div className="home-shop-preview-image-button">
+                    <img
+                      src={`${import.meta.env.BASE_URL}product-images/${product.image}`}
+                      alt={product.name}
+                      className="home-shop-preview-image"
+                    />
+                  </div>
+                  <div className="home-shop-preview-details">
+                    <div className="home-shop-preview-name-row">
+                      <h3 className="home-shop-preview-name mb-0">{product.name}</h3>
+                      <span className="home-shop-preview-price">
+                        <CurrencyAmount value={product.salePrice} />
+                      </span>
+                    </div>
+                    <div className="home-shop-preview-testimony">
+                      {product.testimonyIcon && (
+                        <img
+                          src={`${import.meta.env.BASE_URL}product-images/${product.testimonyIcon}`}
+                          alt=""
+                          className="home-shop-preview-testimony-icon"
+                        />
+                      )}
+                      <div>
+                        <blockquote className="home-shop-preview-quote mb-1">
+                          &ldquo;{product.testimonyQuote}&rdquo;
+                        </blockquote>
+                        {product.testimonySource && (
+                          <p className="home-shop-preview-source mb-0">- {product.testimonySource}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     );
   }
